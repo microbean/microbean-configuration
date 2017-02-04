@@ -1,0 +1,6 @@
+# ${project.name}
+
+The ${project.name} project provides idiomatic configuration for [CDI
+containers][0].
+
+[0]: http://docs.jboss.org/cdi/api/2.0-PFD/javax/enterprise/inject/se/SeContainer.html
