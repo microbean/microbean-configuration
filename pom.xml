@@ -31,7 +31,7 @@
       <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>2.0.Beta1</version>
+        <version>2.0-PFD</version>
         <type>jar</type>
       </dependency>
 
@@ -53,7 +53,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-main</artifactId>
-        <version>1</version>
+        <version>2</version>
         <type>jar</type>
       </dependency>
 
