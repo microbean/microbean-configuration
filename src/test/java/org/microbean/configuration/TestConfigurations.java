@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationValue;
+import org.microbean.configuration.spi.SystemPropertiesConfiguration;
 
 import static org.junit.Assert.assertEquals;
 
@@ -88,7 +89,7 @@ public class TestConfigurations {
     subConfigurations.add(experimentalPhaseConfiguration);
     subConfigurations.add(experimentalPhaseAndTestEnvironmentConfiguration);
     subConfigurations.add(testEnvironmentConfiguration);
-    subConfigurations.add(new PropertiesConfiguration(null, System.getProperties()));
+    subConfigurations.add(new SystemPropertiesConfiguration());
     this.configurations = new Configurations(subConfigurations, null);
   }
 
