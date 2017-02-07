@@ -131,7 +131,7 @@ public class TestConfigurations {
     assertEquals("jdbc:experimental:test", value);    
   }
 
-  @Test
+  @Test(expected = AmbiguousConfigurationValuesException.class)
   public void testErrorCondition1() {
     final Map<String, String> coordinates = new HashMap<>();
     coordinates.put("region", "west");
