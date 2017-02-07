@@ -21,10 +21,13 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConfigurationValue implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  private final Configuration configuration;
   
   private final Map<String, String> coordinates;
 
@@ -32,8 +35,11 @@ public class ConfigurationValue implements Serializable {
   
   private final String value;
 
-  public ConfigurationValue(final Map<String, String> coordinates, final String name, final String value) {
+  public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value) {
     super();
+    Objects.requireNonNull(configuration);
+    Objects.requireNonNull(name);
+    this.configuration = configuration;
     if (coordinates == null || coordinates.isEmpty()) {
       this.coordinates = Collections.emptyMap();
     } else {
@@ -41,6 +47,10 @@ public class ConfigurationValue implements Serializable {
     }
     this.name = name;
     this.value = value;
+  }
+
+  public Configuration getConfiguration() {
+    return this.configuration;
   }
 
   public Map<String, String> getCoordinates() {
@@ -55,7 +65,7 @@ public class ConfigurationValue implements Serializable {
     return this.value;
   }
 
-  public final int size() {
+  public final int specificity() {
     int size = 0;
     final Map<?, ?> coordinates = this.getCoordinates();
     if (coordinates != null) {
@@ -68,6 +78,9 @@ public class ConfigurationValue implements Serializable {
   public int hashCode() {
     int hashCode = 17;
 
+    // Note: getConfiguration() is deliberately omitted from hashCode
+    // calculation.
+    
     final Object coordinates = this.getCoordinates();
     int c = coordinates == null ? 0 : coordinates.hashCode();
     hashCode = 37 * hashCode + c;
@@ -90,6 +103,9 @@ public class ConfigurationValue implements Serializable {
     } else if (other instanceof ConfigurationValue) {
       final ConfigurationValue her = (ConfigurationValue)other;
 
+      // Note: getConfiguration() is deliberately omitted from the
+      // algorithm.
+      
       final Object coordinates = this.getCoordinates();
       if (coordinates == null) {
         if (her.getCoordinates() != null) {
@@ -126,6 +142,9 @@ public class ConfigurationValue implements Serializable {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
+    sb.append("(");
+    sb.append(this.getConfiguration());
+    sb.append(") ");
     final Map<String, String> coordinates = this.getCoordinates();
     if (coordinates != null && !coordinates.isEmpty()) {
       sb.append(coordinates);
