@@ -99,8 +99,12 @@ public class Configurations {
     }
     return returnValue;
   }
+
+  public String getValue(final String name) {
+    return this.getValue(Collections.emptyMap(), name);
+  }
   
-  public final String getValue(Map<String, String> callerCoordinates, final String name) {
+  public String getValue(Map<String, String> callerCoordinates, final String name) {
     if (callerCoordinates == null) {
       callerCoordinates = Collections.emptyMap();
     }
