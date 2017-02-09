@@ -21,16 +21,12 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-public class StringToStringListConverter extends Converter<List<String>> {
+public final class StringToStringListConverter extends Converter<List<String>> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToStringListConverter() {
-    super();
-  }
-
   @Override
-  public List<String> convert(final String value) {
+  public final List<String> convert(final String value) {
     List<String> returnValue = null;
     if (value != null) {
       returnValue = Arrays.stream(value.split(","))

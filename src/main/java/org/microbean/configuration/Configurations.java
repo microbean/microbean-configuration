@@ -83,7 +83,7 @@ public class Configurations {
       converters = Collections.unmodifiableCollection(new LinkedList<>(converters));
     }
     assert converters != null;
-    this.converters = converters.stream().collect(Collectors.toMap(c -> c.getType(), Function.identity()));
+    this.converters = Collections.unmodifiableMap(converters.stream().collect(Collectors.toMap(c -> c.getType(), Function.identity())));
 
     if (arbiters == null) {
       arbiters = this.loadArbiters();
@@ -139,6 +139,10 @@ public class Configurations {
     return returnValue;
   }
 
+  public Map<Type, Converter<?>> getConverters() {
+    return this.converters;
+  }
+  
   public String getValue(final String name) {
     return this.getValue(Collections.emptyMap(), name);
   }

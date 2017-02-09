@@ -16,15 +16,17 @@
  */
 package org.microbean.configuration.spi;
 
-public final class StringToDoubleConverter extends Converter<Double> {
+import java.time.LocalDate;
+
+public final class StringToLocalDateConverter extends Converter<LocalDate> {
 
   private static final long serialVersionUID = 1L;
-
+  
   @Override
-  public final Double convert(final String value) {
-    Double returnValue = null;
+  public final LocalDate convert(final String value) {
+    LocalDate returnValue = null;
     if (value != null) {
-      returnValue = Double.valueOf(value);
+      returnValue = LocalDate.parse(value);
     }
     return returnValue;
   }

@@ -16,17 +16,12 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToFloatConverter extends Converter<Float> {
+public final class StringToFloatConverter extends Converter<Float> {
 
   private static final long serialVersionUID = 1L;
-  
-  public StringToFloatConverter() {
-    super();
-    assert Float.class.equals(this.getType());
-  }
 
   @Override
-  public Float convert(final String value) {
+  public final Float convert(final String value) {
     Float returnValue = null;
     if (value != null) {
       returnValue = Float.valueOf(value);

@@ -16,17 +16,12 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToBooleanConverter extends Converter<Boolean> {
+public final class StringToBooleanConverter extends Converter<Boolean> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToBooleanConverter() {
-    super();
-    assert Boolean.class.equals(this.getType());
-  }
-
   @Override
-  public Boolean convert(final String value) {
+  public final Boolean convert(final String value) {
     Boolean returnValue = null;
     if (value != null) {
       returnValue = Boolean.valueOf(value);

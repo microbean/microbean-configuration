@@ -21,16 +21,12 @@ import java.util.Collection;
 
 import java.util.stream.Collectors;
 
-public class StringToStringCollectionConverter extends Converter<Collection<String>> {
+public final class StringToStringCollectionConverter extends Converter<Collection<String>> {
 
   private static final long serialVersionUID = 1L;
-  
-  public StringToStringCollectionConverter() {
-    super();
-  }
 
   @Override
-  public Collection<String> convert(final String value) {
+  public final Collection<String> convert(final String value) {
     Collection<String> returnValue = null;
     if (value != null) {
       returnValue = Arrays.stream(value.split(","))

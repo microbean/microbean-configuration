@@ -16,15 +16,17 @@
  */
 package org.microbean.configuration.spi;
 
-public final class StringToDoubleConverter extends Converter<Double> {
+import java.math.BigInteger;
+
+public final class StringToBigIntegerConverter extends Converter<BigInteger> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public final Double convert(final String value) {
-    Double returnValue = null;
+  public final BigInteger convert(final String value) {
+    BigInteger returnValue = null;
     if (value != null) {
-      returnValue = Double.valueOf(value);
+      returnValue = new BigInteger(value);
     }
     return returnValue;
   }

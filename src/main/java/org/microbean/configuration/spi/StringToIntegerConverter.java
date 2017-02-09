@@ -16,17 +16,12 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToIntegerConverter extends Converter<Integer> {
+public final class StringToIntegerConverter extends Converter<Integer> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToIntegerConverter() {
-    super();
-    assert Integer.class.equals(this.getType());
-  }
-
   @Override
-  public Integer convert(final String value) {
+  public final Integer convert(final String value) {
     Integer returnValue = null;
     if (value != null) {
       returnValue = Integer.valueOf(value);

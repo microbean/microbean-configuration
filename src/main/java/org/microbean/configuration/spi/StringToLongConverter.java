@@ -16,17 +16,12 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToLongConverter extends Converter<Long> {
+public final class StringToLongConverter extends Converter<Long> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToLongConverter() {
-    super();
-    assert Long.class.equals(this.getType());
-  }
-
   @Override
-  public Long convert(final String value) {
+  public final Long convert(final String value) {
     Long returnValue = null;
     if (value != null) {
       returnValue = Long.valueOf(value);

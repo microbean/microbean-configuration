@@ -18,17 +18,12 @@ package org.microbean.configuration.spi;
 
 import java.net.URI;
 
-public class StringToURIConverter extends Converter<URI> {
+public final class StringToURIConverter extends Converter<URI> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToURIConverter() {
-    super();
-    assert URI.class.equals(this.getType());
-  }
-
   @Override
-  public URI convert(final String value) {
+  public final URI convert(final String value) {
     URI returnValue = null;
     if (value != null) {
       returnValue = URI.create(value);

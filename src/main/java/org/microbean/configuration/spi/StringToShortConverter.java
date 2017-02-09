@@ -16,17 +16,12 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToShortConverter extends Converter<Short> {
+public final class StringToShortConverter extends Converter<Short> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToShortConverter() {
-    super();
-    assert Short.class.equals(this.getType());
-  }
-
   @Override
-  public Short convert(final String value) {
+  public final Short convert(final String value) {
     Short returnValue = null;
     if (value != null) {
       returnValue = Short.valueOf(value);

@@ -21,17 +21,12 @@ import java.net.URL;
 
 import org.microbean.configuration.ConversionException;
 
-public class StringToURLConverter extends Converter<URL> {
+public final class StringToURLConverter extends Converter<URL> {
 
   private static final long serialVersionUID = 1L;
-  
-  public StringToURLConverter() {
-    super();
-    assert URL.class.equals(this.getType());
-  }
 
   @Override
-  public URL convert(final String value) {
+  public final URL convert(final String value) {
     URL returnValue = null;
     if (value != null) {
       try {

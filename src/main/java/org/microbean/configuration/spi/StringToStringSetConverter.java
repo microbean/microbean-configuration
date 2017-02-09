@@ -21,16 +21,12 @@ import java.util.Set;
 
 import java.util.stream.Collectors;
 
-public class StringToStringSetConverter extends Converter<Set<String>> {
+public final class StringToStringSetConverter extends Converter<Set<String>> {
 
   private static final long serialVersionUID = 1L;
   
-  public StringToStringSetConverter() {
-    super();
-  }
-
   @Override
-  public Set<String> convert(final String value) {
+  public final Set<String> convert(final String value) {
     Set<String> returnValue = null;
     if (value != null) {
       returnValue = Arrays.stream(value.split(","))

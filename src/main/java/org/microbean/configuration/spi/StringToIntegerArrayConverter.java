@@ -18,7 +18,7 @@ package org.microbean.configuration.spi;
 
 import java.util.Arrays;
 
-public class StringToIntegerArrayConverter extends Converter<Integer[]> {
+public final class StringToIntegerArrayConverter extends Converter<Integer[]> {
 
   private static final long serialVersionUID = 1L;
 
@@ -33,7 +33,7 @@ public class StringToIntegerArrayConverter extends Converter<Integer[]> {
   }
 
   @Override
-  public Integer[] convert(final String value) {
+  public final Integer[] convert(final String value) {
     Integer[] returnValue = null;
     if (value != null) {
       if (value.isEmpty()) {

@@ -16,15 +16,17 @@
  */
 package org.microbean.configuration.spi;
 
-public final class StringToDoubleConverter extends Converter<Double> {
+import java.time.Instant;
+
+public final class StringToInstantConverter extends Converter<Instant> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public final Double convert(final String value) {
-    Double returnValue = null;
+  public final Instant convert(final String value) {
+    Instant returnValue = null;
     if (value != null) {
-      returnValue = Double.valueOf(value);
+      returnValue = Instant.parse(value);
     }
     return returnValue;
   }

@@ -16,19 +16,14 @@
  */
 package org.microbean.configuration.spi;
 
-public class StringToCharArrayConverter extends Converter<char[]> {
+public final class StringToCharArrayConverter extends Converter<char[]> {
 
   private static final long serialVersionUID = 1L;
 
   private static final char[] EMPTY_CHAR_ARRAY = new char[0];
   
-  public StringToCharArrayConverter() {
-    super();
-    assert char[].class.equals(this.getType());
-  }
-
   @Override
-  public char[] convert(final String value) {
+  public final char[] convert(final String value) {
     char[] returnValue = null;
     if (value != null) {
       if (value.isEmpty()) {
