@@ -16,6 +16,8 @@
  */
 package org.microbean.configuration;
 
+import java.lang.reflect.Type;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,9 +30,15 @@ import java.util.Queue;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import java.util.function.Function;
+
+import java.util.stream.Collectors;
+
 import org.microbean.configuration.spi.Arbiter;
 import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationValue;
+import org.microbean.configuration.spi.Converter;
+import org.microbean.configuration.spi.TypeLiteral;
 
 /**
  *
@@ -42,16 +50,19 @@ public class Configurations {
   private final Collection<Configuration> configurations;
 
   private final Collection<Arbiter> arbiters;
+
+  private final Map<Type, Converter<?>> converters;
   
   public Configurations() {
-    this(null, null);
+    this(null, null, null);
   }
 
   public Configurations(final Collection<? extends Configuration> configurations) {
-    this(configurations, null);
+    this(configurations, null, null);
   }
   
   public Configurations(Collection<? extends Configuration> configurations,
+                        Collection<? extends Converter<?>> converters,
                         Collection<? extends Arbiter> arbiters) {
     super();
     if (configurations == null) {
@@ -62,6 +73,18 @@ public class Configurations {
     } else {
       this.configurations = Collections.unmodifiableCollection(new LinkedList<>(configurations));
     }
+
+    if (converters == null) {
+      converters = this.loadConverters();
+    }
+    if (converters == null || converters.isEmpty()) {
+      converters = Collections.emptySet();
+    } else {
+      converters = Collections.unmodifiableCollection(new LinkedList<>(converters));
+    }
+    assert converters != null;
+    this.converters = converters.stream().collect(Collectors.toMap(c -> c.getType(), Function.identity()));
+
     if (arbiters == null) {
       arbiters = this.loadArbiters();
     }
@@ -86,6 +109,22 @@ public class Configurations {
     return returnValue;
   }
 
+  protected Collection<? extends Converter<?>> loadConverters() {
+    final Collection<Converter<?>> returnValue = new LinkedList<>();
+    @SuppressWarnings("rawtypes")
+    final ServiceLoader<Converter> converterLoader = ServiceLoader.load(Converter.class);
+    assert converterLoader != null;
+    @SuppressWarnings("rawtypes")
+    final Iterator<Converter> converterIterator = converterLoader.iterator();
+    assert converterIterator != null;
+    while (converterIterator.hasNext()) {
+      final Converter<?> converter = converterIterator.next();
+      assert converter != null;
+      returnValue.add(converter);
+    }
+    return returnValue;
+  }
+
   protected Collection<? extends Arbiter> loadArbiters() {
     final Collection<Arbiter> returnValue = new LinkedList<>();
     final ServiceLoader<Arbiter> arbiterLoader = ServiceLoader.load(Arbiter.class);
@@ -105,10 +144,28 @@ public class Configurations {
   }
   
   public String getValue(Map<String, String> callerCoordinates, final String name) {
+    return this.getValue(callerCoordinates, name, String.class);
+  }
+
+  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
+    return this.getValue(callerCoordinates, name, (Type)type);
+  }
+  
+  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
+    @SuppressWarnings("unchecked")
+    final Converter<T> converter = (Converter<T>)this.converters.get(type);
+    if (converter == null) {
+      throw new NoSuchConverterException(null, null, type);
+    }
+    return this.getValue(callerCoordinates, name, converter);
+  }
+  
+  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter) {
+    Objects.requireNonNull(converter);
     if (callerCoordinates == null) {
       callerCoordinates = Collections.emptyMap();
     }
-    String returnValue = null;
+    T returnValue = null;
 
     ConfigurationValue selectedValue = null;    
 
@@ -267,7 +324,7 @@ public class Configurations {
     }
     
     if (selectedValue != null) {
-      returnValue = selectedValue.getValue();
+      returnValue = converter.convert(selectedValue.getValue());
     }
     return returnValue;
   }

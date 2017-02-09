@@ -90,7 +90,7 @@ public class TestConfigurations {
     subConfigurations.add(experimentalPhaseAndTestEnvironmentConfiguration);
     subConfigurations.add(testEnvironmentConfiguration);
     subConfigurations.add(new SystemPropertiesConfiguration());
-    this.configurations = new Configurations(subConfigurations, null);
+    this.configurations = new Configurations(subConfigurations, null, null);
   }
 
 

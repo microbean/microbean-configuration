@@ -1,0 +1,16 @@
+org.microbean.configuration.spi.StringToBooleanConverter
+org.microbean.configuration.spi.StringToCharArrayConverter
+org.microbean.configuration.spi.StringToCharacterArrayConverter
+org.microbean.configuration.spi.StringToDoubleConverter
+org.microbean.configuration.spi.StringToFloatConverter
+org.microbean.configuration.spi.StringToIntArrayConverter
+org.microbean.configuration.spi.StringToIntegerArrayConverter
+org.microbean.configuration.spi.StringToIntegerConverter
+org.microbean.configuration.spi.StringToLongConverter
+org.microbean.configuration.spi.StringToShortConverter
+org.microbean.configuration.spi.StringToStringCollectionConverter
+org.microbean.configuration.spi.StringToStringConverter
+org.microbean.configuration.spi.StringToStringListConverter
+org.microbean.configuration.spi.StringToStringSetConverter
+org.microbean.configuration.spi.StringToURIConverter
+org.microbean.configuration.spi.StringToURLConverter
