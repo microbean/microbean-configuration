@@ -139,8 +139,8 @@ public class Configurations {
     return returnValue;
   }
 
-  public Map<Type, Converter<?>> getConverters() {
-    return this.converters;
+  public Set<Type> getConversionTypes() {
+    return this.converters.keySet();
   }
   
   public String getValue(final String name) {
