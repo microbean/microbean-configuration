@@ -52,6 +52,8 @@ public class Configurations {
   private final Collection<Arbiter> arbiters;
 
   private final Map<Type, Converter<?>> converters;
+
+  private transient Map<String, String> configurationCoordinates;
   
   public Configurations() {
     this(null, null, null);
@@ -93,6 +95,8 @@ public class Configurations {
     } else {
       this.arbiters = Collections.unmodifiableCollection(new LinkedList<>(arbiters));
     }
+    this.configurationCoordinates = this.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
+        private static final long serialVersionUID = 1L; }.getType());
   }
 
   protected Collection<? extends Configuration> loadConfigurations() {
@@ -139,12 +143,16 @@ public class Configurations {
     return returnValue;
   }
 
+  public Map<String, String> getConfigurationCoordinates() {
+    return this.configurationCoordinates;
+  }
+  
   public Set<Type> getConversionTypes() {
     return this.converters.keySet();
   }
   
   public String getValue(final String name) {
-    return this.getValue(Collections.emptyMap(), name);
+    return this.getValue(this.getConfigurationCoordinates(), name, String.class);
   }
   
   public String getValue(Map<String, String> callerCoordinates, final String name) {

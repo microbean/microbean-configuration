@@ -29,8 +29,10 @@ import org.junit.Test;
 import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationValue;
 import org.microbean.configuration.spi.SystemPropertiesConfiguration;
+import org.microbean.configuration.spi.TypeLiteral;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestConfigurations {
 
@@ -138,6 +140,18 @@ public class TestConfigurations {
     coordinates.put("region", "west");
     coordinates.put("phase", "experimental");
     final String value = this.configurations.getValue(coordinates, "db.url"); // should fail
+  }
+
+  @Test
+  public void testAcquireCoordinates() {
+    System.setProperty("configurationCoordinates", "{a=b,c=d}");
+    final Map<String, String> coordinates = this.configurations.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
+        private static final long serialVersionUID = 1L; }.getType());
+    assertNotNull(coordinates);
+    assertEquals(2, coordinates.size());
+    assertEquals("b", coordinates.get("a"));
+    assertEquals("d", coordinates.get("c"));
+    System.clearProperty("configurationCoordinates");
   }
 
 

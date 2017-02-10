@@ -24,6 +24,10 @@ public class ConversionException extends ConfigurationException {
     super();
   }
 
+  public ConversionException(final String message) {
+    super(message, null);
+  }
+  
   public ConversionException(final Throwable cause) {
     super(null, cause);
   }

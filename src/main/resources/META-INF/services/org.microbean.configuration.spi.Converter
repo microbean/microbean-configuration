@@ -11,6 +11,7 @@ org.microbean.configuration.spi.StringToIntegerArrayConverter
 org.microbean.configuration.spi.StringToIntegerConverter
 org.microbean.configuration.spi.StringToLocalDateConverter
 org.microbean.configuration.spi.StringToLongConverter
+org.microbean.configuration.spi.StringToMapStringStringConverter
 org.microbean.configuration.spi.StringToShortConverter
 org.microbean.configuration.spi.StringToStringCollectionConverter
 org.microbean.configuration.spi.StringToStringConverter
