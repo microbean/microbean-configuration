@@ -53,7 +53,7 @@ public class Configurations {
 
   private final Map<Type, Converter<?>> converters;
 
-  private transient Map<String, String> configurationCoordinates;
+  private final Map<String, String> configurationCoordinates;
   
   public Configurations() {
     this(null, null, null);
@@ -230,7 +230,7 @@ public class Configurations {
               // There aren't any conflicts yet; this is good.  This
               // value will be our candidate.
               selectedValue = value;
-              
+
             } else {
               // We got a match, but we already *had* a match, so we
               // don't have a candidate--instead, add it to the bucket
@@ -321,9 +321,26 @@ public class Configurations {
           }
         } else if (valueSpecificity == highestSpecificitySoFarEncountered) {
           assert selectedValue != null;
-          valuesToArbitrate.add(selectedValue);
-          selectedValue = null;
-          valuesToArbitrate.add(value);
+          if (value.isAuthoritative()) {
+            if (selectedValue.isAuthoritative()) {
+              // Both say they're authoritative; arbitration required
+              valuesToArbitrate.add(selectedValue);
+              selectedValue = null;
+              valuesToArbitrate.add(value);
+            } else {
+              // value is authoritative; selectedValue is not; so swap
+              // them
+              selectedValue = value;
+            }
+          } else if (selectedValue.isAuthoritative()) {
+            // value is not authoritative; selected value is; so just
+            // drop value on the floor; it's not authoritative.
+          } else {
+            // Neither is authoritative; arbitration required.
+            valuesToArbitrate.add(selectedValue);
+            selectedValue = null;
+            valuesToArbitrate.add(value);
+          }
         } else {
           assert false : "valueSpecificity > highestSpecificitySoFarEncountered: " + valueSpecificity + " > " + highestSpecificitySoFarEncountered;
         }

@@ -33,7 +33,7 @@ public class ConfigurationCoordinates implements Configuration {
     if ("configurationCoordinates".equals(name)) {
       final String configurationCoordinates = System.getProperty("configurationCoordinates");
       if (configurationCoordinates != null) {
-        returnValue = new ConfigurationValue(this, null, name, configurationCoordinates);
+        returnValue = new ConfigurationValue(this, null, name, configurationCoordinates, true);
       }
     }
     return returnValue;

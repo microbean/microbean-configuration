@@ -35,7 +35,13 @@ public class ConfigurationValue implements Serializable {
   
   private final String value;
 
+  private final boolean authoritative;
+
   public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value) {
+    this(configuration, coordinates, name, value, false);
+  }
+  
+  public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value, final boolean authoritative) {
     super();
     Objects.requireNonNull(configuration);
     Objects.requireNonNull(name);
@@ -47,6 +53,7 @@ public class ConfigurationValue implements Serializable {
     }
     this.name = name;
     this.value = value;
+    this.authoritative = authoritative;
   }
 
   public Configuration getConfiguration() {
@@ -65,6 +72,10 @@ public class ConfigurationValue implements Serializable {
     return this.value;
   }
 
+  public boolean isAuthoritative() {
+    return this.authoritative;
+  }
+
   public final int specificity() {
     int size = 0;
     final Map<?, ?> coordinates = this.getCoordinates();
@@ -78,8 +89,8 @@ public class ConfigurationValue implements Serializable {
   public int hashCode() {
     int hashCode = 17;
 
-    // Note: getConfiguration() is deliberately omitted from hashCode
-    // calculation.
+    // Note: getConfiguration() and isAuthoritative() are deliberately
+    // omitted from hashCode calculation.
     
     final Object coordinates = this.getCoordinates();
     int c = coordinates == null ? 0 : coordinates.hashCode();
@@ -103,8 +114,8 @@ public class ConfigurationValue implements Serializable {
     } else if (other instanceof ConfigurationValue) {
       final ConfigurationValue her = (ConfigurationValue)other;
 
-      // Note: getConfiguration() is deliberately omitted from the
-      // algorithm.
+      // Note: getConfiguration() and isAuthoritative() are
+      // deliberately omitted from the algorithm.
       
       final Object coordinates = this.getCoordinates();
       if (coordinates == null) {
