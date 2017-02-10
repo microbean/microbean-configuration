@@ -37,7 +37,25 @@
     </dependency>
     
   </dependencies>
-    
+
+  <build>
+    <resources>
+
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      
+      <resource>
+        <targetPath>META-INF</targetPath>
+        <directory/>
+        <includes>
+          <include>LICENSE</include>
+        </includes>
+      </resource>
+      
+    </resources>
+  </build>
+  
   <reporting>
     <plugins>
       <plugin>
