@@ -92,9 +92,12 @@ public abstract class TypeLiteral<T> implements Serializable {
    * and looking to use the subsequently extended type inspection
    * capabilities of this class.</p>
    *
-   * @param the first class beneath this class in the subclass
-   * hierarchy whose immediate subclasses will be inspected for
-   * parameterized type information; must not be {@code null}
+   * @param <T> a type representing a subclass of {@link TypeLiteral}
+   *
+   * @param classHierarchyParent the first class beneath this class in
+   * the subclass hierarchy whose immediate subclasses will be
+   * inspected for parameterized type information; must not be {@code
+   * null}
    *
    * @exception NullPointerException if {@code classHierarchyParent}
    * is {@code null}
@@ -132,7 +135,7 @@ public abstract class TypeLiteral<T> implements Serializable {
 
   /**
    * Returns a hashcode for this {@link TypeLiteral} based off its
-   * {@link #getType() Type}'s {@linkplain Type#hashCode() hashcode}.
+   * {@link #getType() Type}'s hashcode.
    *
    * @return a hashcode for this {@link TypeLiteral}
    *
@@ -150,7 +153,7 @@ public abstract class TypeLiteral<T> implements Serializable {
    *
    * <p>Two {@link TypeLiteral} instances are equal if their {@link
    * #getType()} methods' return values {@linkplain
-   * Type#equals(Object) are equal}.</p>
+   * Object#equals(Object) are equal}.</p>
    *
    * @param other the {@link Object} to test; may be {@code null}
    *

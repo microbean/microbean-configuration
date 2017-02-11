@@ -27,7 +27,7 @@ public class ConfigurationValue implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final Configuration configuration;
+  private transient Configuration configuration;
   
   private final Map<String, String> coordinates;
 

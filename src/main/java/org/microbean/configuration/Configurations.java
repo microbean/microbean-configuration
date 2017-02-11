@@ -41,12 +41,31 @@ import org.microbean.configuration.spi.Converter;
 import org.microbean.configuration.spi.TypeLiteral;
 
 /**
+ * A single source for configuration values in an application.
+ *
+ * <h2>Design Notes</h2>
+ *
+ * <p>The {@code public} methods in this class are not {@code final}
+ * only so that {@link Configurations} objects may be used in
+ * environments requiring proxies (like CDI, HK2 and the like).  In
+ * general, overriding of non-{@code protected} methods is
+ * discouraged, and in such cases the burden is fully upon the
+ * overrider to make sure that contracts described in this class
+ * documentation are honored.</p>
  *
  * @author <a href="http://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
+ *
+ * @see Configuration
  */
 public class Configurations {
 
+
+  /*
+   * Instance fields.
+   */
+
+  
   private final Collection<Configuration> configurations;
 
   private final Collection<Arbiter> arbiters;
@@ -54,6 +73,12 @@ public class Configurations {
   private final Map<Type, Converter<?>> converters;
 
   private final Map<String, String> configurationCoordinates;
+
+
+  /*
+   * Constructors.
+   */
+
   
   public Configurations() {
     this(null, null, null);
@@ -95,9 +120,21 @@ public class Configurations {
     } else {
       this.arbiters = Collections.unmodifiableCollection(new LinkedList<>(arbiters));
     }
-    this.configurationCoordinates = this.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
+
+    final Map<String, String> coordinates = this.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
         private static final long serialVersionUID = 1L; }.getType());
+    if (coordinates == null || coordinates.isEmpty()) {
+      this.configurationCoordinates = Collections.emptyMap();
+    } else {
+      this.configurationCoordinates = Collections.unmodifiableMap(coordinates);
+    }
   }
+
+
+  /*
+   * Instance methods.
+   */
+  
 
   protected Collection<? extends Configuration> loadConfigurations() {
     final Collection<Configuration> returnValue = new LinkedList<>();
@@ -159,8 +196,24 @@ public class Configurations {
     return this.getValue(callerCoordinates, name, String.class);
   }
 
+  public <T> T getValue(final String name, final Class<T> type) {
+    return this.getValue(this.getConfigurationCoordinates(), name, type);
+  }
+  
   public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
     return this.getValue(callerCoordinates, name, (Type)type);
+  }
+
+  public <T> T getValue(final String name, final TypeLiteral<T> typeLiteral) {
+    return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral);
+  }
+  
+  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
+    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType());
+  }
+
+  public <T> T getValue(final String name, final Type type) {
+    return this.getValue(this.getConfigurationCoordinates(), name, type);
   }
   
   public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
@@ -170,6 +223,10 @@ public class Configurations {
       throw new NoSuchConverterException(null, null, type);
     }
     return this.getValue(callerCoordinates, name, converter);
+  }
+
+  public <T> T getValue(final String name, final Converter<T> converter) {
+    return this.getValue(this.getConfigurationCoordinates(), name, converter);
   }
   
   public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter) {
@@ -265,13 +322,11 @@ public class Configurations {
           badValues.add(value);
           
         } else if (selectedValue != null) {
-          assert callerCoordinatesSize > valueCoordinatesSize;
           // Nothing to do; we've already got our candidate.  We don't
           // break here because we're going to ensure there aren't any
           // duplicates.
           
         } else if (callerCoordinates.entrySet().containsAll(valueCoordinates.entrySet())) {
-          assert callerCoordinatesSize > valueCoordinatesSize;
           // We specified, e.g., {a=b, c=d, e=f} and they have, say,
           // {c=d, e=f} or {a=b, c=d} etc. but not, say, {q=r}.
           if (values == null) {
@@ -280,8 +335,6 @@ public class Configurations {
           values.add(value);
           
         } else {
-          assert callerCoordinatesSize > valueCoordinatesSize;
-          assert selectedValue == null;
           // Bad value!
           if (badValues == null) {
             badValues = new LinkedList<>();
@@ -348,7 +401,7 @@ public class Configurations {
       }
       
       if (!valuesToArbitrate.isEmpty()) {
-        selectedValue = this.arbitrate(callerCoordinates, name, valuesToArbitrate);
+        selectedValue = this.performArbitration(callerCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
       }
     }
     
@@ -358,15 +411,61 @@ public class Configurations {
     return returnValue;
   }
 
+  /**
+   * Handles any badly formed {@link ConfigurationValue} instances
+   * received from {@link Configuration} instances during the
+   * execution of a configuration value request.
+   *
+   * <p>The default implementation of this method does nothing.
+   * Malformed values are thus effectively discarded.</p>
+   *
+   * @param badValues a {@link Collection} of {@link
+   * ConfigurationValue} instances that were deemed to be malformed in
+   * some way; may be {@code null}
+   */
   protected void handleMalformedConfigurationValues(final Collection<ConfigurationValue> badValues) {
-    if (badValues != null) {
-      badValues.clear();
-    }
+    
   }
-  
-  protected ConfigurationValue arbitrate(final Map<? extends String, ? extends String> callerCoordinates,
-                                         final String name,
-                                         final Collection<ConfigurationValue> values) {
+
+  /**
+   * Given a logical request for a configuration value, represented by
+   * the {@code callerCoordinates} and {@code name} parameter values,
+   * and a {@link Collection} of {@link ConfigurationValue} instances
+   * that represents the ambiguous response from several {@link
+   * Configuration} instances, attempts to resolve the ambiguity by
+   * returning a single {@link ConfigurationValue} instead.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * <p>The default implementation of this method asks all registered
+   * {@link Arbiter}s in turn to perform the arbitration and returns
+   * the first non-{@code null} response received.</p>
+   *
+   * @param callerCoordinates the ({@linkplain
+   * Collections#unmodifiableMap(Map) immutable}) configuration
+   * coordinates in effect for the request; may be {@code null}
+   *
+   * @param name the name of the configuration value; may be {@code
+   * null}
+   *
+   * @param values an {@linkplain
+   * Collections#unmodifiableCollection(Collection) immutable} {@link
+   * Collection} of definitionally ambiguous {@link
+   * ConfigurationValue}s that resulted from the request; may be
+   * {@code null}
+   *
+   * @return the result of arbitration, or {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if successful
+   * arbitration did not happen for any reason
+   *
+   * @see Arbiter
+   */
+  protected ConfigurationValue performArbitration(final Map<? extends String, ? extends String> callerCoordinates,
+                                                  final String name,
+                                                  final Collection<? extends ConfigurationValue> values) {
     if (this.arbiters != null && !this.arbiters.isEmpty()) {
       for (final Arbiter arbiter : arbiters) {
         if (arbiter != null) {
