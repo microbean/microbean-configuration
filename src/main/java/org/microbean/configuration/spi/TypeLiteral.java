@@ -237,6 +237,4 @@ public abstract class TypeLiteral<T> implements Serializable {
     return returnValue;
   }
 
-  private static final class X {}
-  
 }
