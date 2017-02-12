@@ -184,39 +184,39 @@ public class Configurations {
     return this.configurationCoordinates;
   }
   
-  public Set<Type> getConversionTypes() {
+  public final Set<Type> getConversionTypes() {
     return this.converters.keySet();
   }
   
-  public String getValue(final String name) {
+  public final String getValue(final String name) {
     return this.getValue(this.getConfigurationCoordinates(), name, String.class);
   }
   
-  public String getValue(Map<String, String> callerCoordinates, final String name) {
+  public final String getValue(Map<String, String> callerCoordinates, final String name) {
     return this.getValue(callerCoordinates, name, String.class);
   }
 
-  public <T> T getValue(final String name, final Class<T> type) {
+  public final <T> T getValue(final String name, final Class<T> type) {
     return this.getValue(this.getConfigurationCoordinates(), name, type);
   }
   
-  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
     return this.getValue(callerCoordinates, name, (Type)type);
   }
 
-  public <T> T getValue(final String name, final TypeLiteral<T> typeLiteral) {
+  public final <T> T getValue(final String name, final TypeLiteral<T> typeLiteral) {
     return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral);
   }
   
-  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
     return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType());
   }
 
-  public <T> T getValue(final String name, final Type type) {
+  public final <T> T getValue(final String name, final Type type) {
     return this.getValue(this.getConfigurationCoordinates(), name, type);
   }
   
-  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
     @SuppressWarnings("unchecked")
     final Converter<T> converter = (Converter<T>)this.converters.get(type);
     if (converter == null) {
@@ -225,7 +225,7 @@ public class Configurations {
     return this.getValue(callerCoordinates, name, converter);
   }
 
-  public <T> T getValue(final String name, final Converter<T> converter) {
+  public final <T> T getValue(final String name, final Converter<T> converter) {
     return this.getValue(this.getConfigurationCoordinates(), name, converter);
   }
   
