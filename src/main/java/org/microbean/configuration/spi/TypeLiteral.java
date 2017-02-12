@@ -21,8 +21,6 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,6 +28,8 @@ import java.util.Objects;
  *
  * @author <a href="http://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
+ *
+ * @param <T> the type being represented
  *
  * @see Type
  */

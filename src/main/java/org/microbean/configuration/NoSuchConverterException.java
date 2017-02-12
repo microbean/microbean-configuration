@@ -18,8 +18,6 @@ package org.microbean.configuration;
 
 import java.lang.reflect.Type;
 
-import org.microbean.configuration.spi.Converter;
-
 public class NoSuchConverterException extends ConfigurationException {
 
   private static final long serialVersionUID = 1L;

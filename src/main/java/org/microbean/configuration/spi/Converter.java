@@ -18,12 +18,6 @@ package org.microbean.configuration.spi;
 
 import java.io.Serializable; // for javadoc only
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * A {@link TypeLiteral} that can convert {@link String} values into
  * another kind of {@link Object}.

@@ -16,10 +16,7 @@
  */
 package org.microbean.configuration.spi;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.Properties;
 
 public class ConfigurationCoordinates implements Configuration {
 
