@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SystemPropertiesConfiguration implements Configuration {
+public class SystemPropertiesConfiguration extends AbstractConfiguration {
 
   private static final Set<String> systemPropertiesGuaranteedToExist = new HashSet<>(29, 1F);
 

@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -41,17 +42,8 @@ import org.microbean.configuration.spi.Converter;
 import org.microbean.configuration.spi.TypeLiteral;
 
 /**
- * A single source for configuration values in an application.
- *
- * <h2>Design Notes</h2>
- *
- * <p>The {@code public} methods in this class are not {@code final}
- * only so that {@link Configurations} objects may be used in
- * environments requiring proxies (like CDI, HK2 and the like).  In
- * general, overriding of non-{@code protected} methods is
- * discouraged, and in such cases the burden is fully upon the
- * overrider to make sure that contracts described in this class
- * documentation are honored.</p>
+ * A single source for configuration values suitable for an
+ * application.
  *
  * @author <a href="http://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
@@ -62,10 +54,40 @@ public class Configurations {
 
 
   /*
-   * Instance fields.
+   * Static fields.
    */
 
   
+  /**
+   * The name of the configuration property whose value is a {@link
+   * Map} of <em>configuration coordinates</em> for the current
+   * application.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * <p>A request is made via the {@link #getValue(Map, String, Type)}
+   * method with {@code null} as the value of its first parameter and
+   * the value of this field as its second parameter and {@link Map
+   * Map.class} as the value of its third parameter.  The returned
+   * {@link Map} is cached for the lifetime of this {@link
+   * Configurations} object and is returned by the {@link
+   * #getConfigurationCoordinates()} method.</p>
+   *
+   * @see #getValue(Map, String, Type)
+   *
+   * @see #getConfigurationCoordinates()
+   */
+  public static final String CONFIGURATION_COORDINATES = "configurationCoordinates";
+
+  private final ThreadLocal<Set<Configuration>> currentlyActiveConfigurations;
+  
+
+  /*
+   * Instance fields.
+   */
+
+  private final boolean initialized;
+
   private final Collection<Configuration> configurations;
 
   private final Collection<Arbiter> arbiters;
@@ -79,19 +101,83 @@ public class Configurations {
    * Constructors.
    */
 
-  
+
+  /**
+   * Creates a new {@link Configurations}.
+   *
+   * <p>The {@link #loadConfigurations()}, {@link #loadConverters()}
+   * and {@link #loadArbiters()} methods will be invoked during
+   * construction.</p>
+   *
+   * @see #loadConfigurations()
+   *
+   * @see #loadConverters()
+   *
+   * @see #loadArbiters()
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   public Configurations() {
     this(null, null, null);
   }
 
+  /**
+   * Creates a new {@link Configurations}.
+   *
+   * <p>The {@link #loadConverters()} and {@link #loadArbiters()}
+   * methods will be invoked during construction.  IF the supplied
+   * {@code configurations} is {@code null}, then the {@link
+   * #loadConfigurations()} method will be invoked during
+   * construction.</p>
+   *
+   * @param configurations a {@link Collection} of {@link
+   * Configuration} instances; if {@code null} then the return value
+   * of the {@link #loadConfigurations()} method will be used instead
+   *
+   * @see #loadConfigurations()
+   *
+   * @see #loadConverters()
+   *
+   * @see #loadArbiters()
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   public Configurations(final Collection<? extends Configuration> configurations) {
     this(configurations, null, null);
   }
-  
+
+  /**
+   * Creates a new {@link Configurations}.
+   *
+   * <p>The {@link #loadConverters()} and {@link #loadArbiters()}
+   * methods will be invoked during construction.  IF the supplied
+   * {@code configurations} is {@code null}, then the {@link
+   * #loadConfigurations()} method will be invoked during
+   * construction.</p>
+   *
+   * @param configurations a {@link Collection} of {@link
+   * Configuration} instances; if {@code null} then the return value
+   * of the {@link #loadConfigurations()} method will be used instead
+   *
+   * @param converters a {@link Collection} of {@link Converter}
+   * instances; if {@code null} then the return value of the {@link
+   * #loadConverters()} method will be used instead
+   *
+   * @param arbiters a {@link Collection} of {@link Arbiter}
+   * instances; if {@code null} then the return value of the {@link
+   * #loadArbiters()} method will be used instead
+   *
+   * @see #loadConfigurations()
+   *
+   * @see #loadConverters()
+   *
+   * @see #loadArbiters()
+   */
   public Configurations(Collection<? extends Configuration> configurations,
                         Collection<? extends Converter<?>> converters,
                         Collection<? extends Arbiter> arbiters) {
     super();
+    this.currentlyActiveConfigurations = ThreadLocal.withInitial(() -> new HashSet<>());
     if (configurations == null) {
       configurations = this.loadConfigurations();
     }
@@ -99,6 +185,11 @@ public class Configurations {
       this.configurations = Collections.emptySet();
     } else {
       this.configurations = Collections.unmodifiableCollection(new LinkedList<>(configurations));
+    }
+    for (final Configuration configuration : configurations) {
+      if (configuration != null) {
+        configuration.setConfigurations(this);
+      }
     }
 
     if (converters == null) {
@@ -121,13 +212,16 @@ public class Configurations {
       this.arbiters = Collections.unmodifiableCollection(new LinkedList<>(arbiters));
     }
 
-    final Map<String, String> coordinates = this.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
+    this.initialized = true;
+    
+    final Map<String, String> coordinates = this.getValue(null, CONFIGURATION_COORDINATES, new TypeLiteral<Map<String, String>>() {
         private static final long serialVersionUID = 1L; }.getType());
     if (coordinates == null || coordinates.isEmpty()) {
       this.configurationCoordinates = Collections.emptyMap();
     } else {
       this.configurationCoordinates = Collections.unmodifiableMap(coordinates);
     }
+
   }
 
 
@@ -136,6 +230,23 @@ public class Configurations {
    */
   
 
+  /**
+   * Loads a {@link Collection} of {@link Configuration} objects and
+   * returns it.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>The default implementation of this method uses the {@link
+   * ServiceLoader} mechanism to load {@link Configuration}
+   * instances.</p>
+   *
+   * @return a non-{@code null}, {@link Collection} of {@link
+   * Configuration} instances
+   *
+   * @see ServiceLoader#load(Class)
+   */
   protected Collection<? extends Configuration> loadConfigurations() {
     final Collection<Configuration> returnValue = new LinkedList<>();
     final ServiceLoader<Configuration> configurationLoader = ServiceLoader.load(Configuration.class);
@@ -150,6 +261,22 @@ public class Configurations {
     return returnValue;
   }
 
+  /**
+   * Loads a {@link Collection} of {@link Converter} objects and
+   * returns it.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>The default implementation of this method uses the {@link
+   * ServiceLoader} mechanism to load {@link Converter} instances.</p>
+   *
+   * @return a non-{@code null}, {@link Collection} of {@link
+   * Converter} instances
+   *
+   * @see ServiceLoader#load(Class)
+   */
   protected Collection<? extends Converter<?>> loadConverters() {
     final Collection<Converter<?>> returnValue = new LinkedList<>();
     @SuppressWarnings("rawtypes")
@@ -166,6 +293,22 @@ public class Configurations {
     return returnValue;
   }
 
+  /**
+   * Loads a {@link Collection} of {@link Arbiter} objects and returns
+   * it.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>The default implementation of this method uses the {@link
+   * ServiceLoader} mechanism to load {@link Arbiter} instances.</p>
+   *
+   * @return a non-{@code null}, {@link Collection} of {@link Arbiter}
+   * instances
+   *
+   * @see ServiceLoader#load(Class)
+   */
   protected Collection<? extends Arbiter> loadArbiters() {
     final Collection<Arbiter> returnValue = new LinkedList<>();
     final ServiceLoader<Arbiter> arbiterLoader = ServiceLoader.load(Arbiter.class);
@@ -180,57 +323,171 @@ public class Configurations {
     return returnValue;
   }
 
+  /**
+   * Returns a {@link Map} of <em>configuration
+   * coordinates</em>&mdash;aspects and their values that define a
+   * location within which requests for configuration values may take
+   * place.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * <p>The default implementation of this method returns
+   * configuration coordinates that are discovered at {@linkplain
+   * #Configurations() construction time} and cached for the lifetime
+   * of this {@link Configurations} object.</p>
+   *
+   * @return a {@link Map} of configuration coordinates; may be {@code
+   * null}
+   */
   public Map<String, String> getConfigurationCoordinates() {
     return this.configurationCoordinates;
   }
-  
+
+  /**
+   * Returns a non-{@code null}, {@linkplain
+   * Collections#unmodifiableSet(Set) immutable} {@link Set} of {@link
+   * Type}s representing all the types to which {@link String}
+   * configuration values may be converted by the {@linkplain
+   * #loadConverters() <code>Converter</code>s loaded} by this {@link
+   * Configurations} object.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return a non-{@code null}, {@linkplain
+   * Collections#unmodifiableSet(Set) immutable} {@link Set} of {@link
+   * Type}s
+   */
   public final Set<Type> getConversionTypes() {
+    this.checkState();
     return this.converters.keySet();
   }
   
   public final String getValue(final String name) {
-    return this.getValue(this.getConfigurationCoordinates(), name, String.class);
+    return this.getValue(this.getConfigurationCoordinates(), name, String.class, null);
+  }
+
+  public final String getValue(final String name, final String defaultValue) {
+    return this.getValue(this.getConfigurationCoordinates(), name, String.class, defaultValue);
   }
   
   public final String getValue(Map<String, String> callerCoordinates, final String name) {
-    return this.getValue(callerCoordinates, name, String.class);
+    return this.getValue(callerCoordinates, name, String.class, null);
+  }
+
+  public final String getValue(Map<String, String> callerCoordinates, final String name, final String defaultValue) {
+    return this.getValue(callerCoordinates, name, String.class, defaultValue);
   }
 
   public final <T> T getValue(final String name, final Class<T> type) {
-    return this.getValue(this.getConfigurationCoordinates(), name, type);
+    return this.getValue(this.getConfigurationCoordinates(), name, type, null);
+  }
+
+  public final <T> T getValue(final String name, final Class<T> type, final String defaultValue) {
+    return this.getValue(this.getConfigurationCoordinates(), name, type, defaultValue);
   }
   
   public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
-    return this.getValue(callerCoordinates, name, (Type)type);
+    return this.getValue(callerCoordinates, name, (Type)type, null);
+  }
+
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type, final String defaultValue) {
+    return this.getValue(callerCoordinates, name, (Type)type, defaultValue);
   }
 
   public final <T> T getValue(final String name, final TypeLiteral<T> typeLiteral) {
-    return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral);
+    return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral, null);
+  }
+
+  public final <T> T getValue(final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
+    return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral, defaultValue);
   }
   
   public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
-    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType());
+    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), null);
+  }
+
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
+    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), defaultValue);
   }
 
   public final <T> T getValue(final String name, final Type type) {
-    return this.getValue(this.getConfigurationCoordinates(), name, type);
+    return this.getValue(this.getConfigurationCoordinates(), name, type, null);
+  }
+
+  public final <T> T getValue(final String name, final Type type, final String defaultValue) {
+    return this.getValue(this.getConfigurationCoordinates(), name, type, defaultValue);
   }
   
   public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
+    return this.getValue(callerCoordinates, name, type, null);
+  }
+
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type, final String defaultValue) {
     @SuppressWarnings("unchecked")
     final Converter<T> converter = (Converter<T>)this.converters.get(type);
     if (converter == null) {
       throw new NoSuchConverterException(null, null, type);
     }
-    return this.getValue(callerCoordinates, name, converter);
+    return this.getValue(callerCoordinates, name, converter, defaultValue);
   }
 
   public final <T> T getValue(final String name, final Converter<T> converter) {
-    return this.getValue(this.getConfigurationCoordinates(), name, converter);
+    return this.getValue(this.getConfigurationCoordinates(), name, converter, null);
   }
   
-  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter) {
+  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter) {
+    return this.getValue(callerCoordinates, name, converter, null);
+  }
+
+  /**
+   * Returns an object that is the value for the configuration request
+   * represented by the supplied {@code callerCoordinates}, {@code
+   * name} and {@code defaultValue} parameters, as converted by the
+   * supplied {@link Converter}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type of the object to be returned
+   *
+   * @param callerCoordinates the configuration coordinates for which
+   * a value should be selected; may be {@code null}
+   *
+   * @param name the name of the configuration property within the
+   * world defined by the supplied {@code configurationCoordinates}
+   * whose value is to be selected; must not be {@code null}
+   *
+   * @param converter a {@link Converter} instance that will convert
+   * any {@link String} configuration value into the type of object
+   * that this method will return; must not be {@code null}
+   *
+   * @param defaultValue the fallback default value to use as an
+   * absolute last resort; may be {@code null}; will also be converted
+   * by the supplied {@link Converter}
+   *
+   * @return the value for the implied configuration property, or {@code null}
+   *
+   * @exception NullPointerException if either {@code name} or {@code
+   * converter} is {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
+   * @see Converter#convert(String)
+   *
+   * @see Configuration#getValue(Map, String)
+   *
+   * @see #performArbitration(Map, String, Collection)
+   *
+   * @see #handleMalformedConfigurationValues(Collection)
+   */
+  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter, final String defaultValue) {
+    Objects.requireNonNull(name);
     Objects.requireNonNull(converter);
+    this.checkState();
     if (callerCoordinates == null) {
       callerCoordinates = Collections.emptyMap();
     }
@@ -239,8 +496,9 @@ public class Configurations {
     ConfigurationValue selectedValue = null;    
 
     // We use a PriorityQueue of ConfigurationValues sorted by their
-    // specificity to keep track of the most specific
-    // ConfigurationValue found so far.  We create it only when necessary.
+    // specificity (most specific first) to keep track of the most
+    // specific ConfigurationValue found so far.  We create it only
+    // when necessary.
     final Comparator<ConfigurationValue> comparator = Comparator.<ConfigurationValue>comparingInt(v -> v.specificity()).reversed();
     PriorityQueue<ConfigurationValue> values = null;
 
@@ -248,16 +506,22 @@ public class Configurations {
     
     for (final Configuration configuration : this.configurations) {
       assert configuration != null;
-      
-      final ConfigurationValue value = configuration.getValue(callerCoordinates, name);
+
+      final ConfigurationValue value;
+      try {
+        if (isActive(configuration)) {
+          value = null;
+        } else {
+          this.activate(configuration);
+          value = configuration.getValue(callerCoordinates, name);
+        }
+      } finally {
+        this.deactivate(configuration);
+      }
+
       if (value != null) {
 
-        if (name == null) {
-          if (value.getName() != null) {
-            badValues.add(value);
-          }
-          continue;
-        } else if (!name.equals(value.getName())) {
+        if (!name.equals(value.getName())) {
           badValues.add(value);
           continue;
         }
@@ -344,6 +608,7 @@ public class Configurations {
         }
       }
     }
+    assert this.allConfigurationsInactive();
 
     if (badValues != null && !badValues.isEmpty()) {
       this.handleMalformedConfigurationValues(badValues);
@@ -405,7 +670,9 @@ public class Configurations {
       }
     }
     
-    if (selectedValue != null) {
+    if (selectedValue == null) {
+      returnValue = converter.convert(defaultValue);
+    } else {
       returnValue = converter.convert(selectedValue.getValue());
     }
     return returnValue;
@@ -479,4 +746,98 @@ public class Configurations {
     throw new AmbiguousConfigurationValuesException(null, null, callerCoordinates, name, values);
   }
 
+  /**
+   * If this {@link Configurations} has not yet finished {@linkplain
+   * #Configurations() constructing}, then this method will throw an
+   * {@link IllegalStateException}.
+   *
+   * @exception IllegalStateException if this {@link Configurations}
+   * has not yet finished {@linkplain #Configurations() constructing}
+   *
+   * @see #Configurations()
+   */
+  private final void checkState() {
+    if (!this.initialized) {
+      throw new IllegalStateException();
+    }
+  }
+
+  /**
+   * Returns {@code true} if the supplied {@link Configuration} is
+   * currently in the middle of executing its {@link
+   * Configuration#getValue(Map, String)} method on the current {@link
+   * Thread}.
+   *
+   * @param configuration the {@link Configuration} to test; may be
+   * {@code null} in which case {@code false} will be returned
+   *
+   * @return {@code true} if the supplied {@link Configuration} is
+   * active; {@code false} otherwise
+   *
+   * @see #activate(Configuration)
+   *
+   * @see #deactivate(Configuration)
+   */
+  private final boolean isActive(final Configuration configuration) {
+    return configuration != null && this.currentlyActiveConfigurations.get().contains(configuration);
+  }
+
+  /**
+   * Records that the supplied {@link Configuration} is in the middle
+   * of executing its {@link Configuration#getValue(Map, String)}
+   * method on the current {@link Thread}.
+   *
+   * <p>This method is idempotent.</p>
+   *
+   * @param configuration the {@link Configuration} in question; may
+   * be {@code null} in which case no action is taken
+   *
+   * @see #isActive(Configuration)
+   *
+   * @see #deactivate(Configuration)
+   */
+  private final void activate(final Configuration configuration) {
+    if (configuration != null) {
+      this.currentlyActiveConfigurations.get().add(configuration);
+      assert this.isActive(configuration);
+    }
+  }
+
+  /**
+   * Records that the supplied {@link Configuration} is no longer in
+   * the middle of executing its {@link Configuration#getValue(Map,
+   * String)} method on the current {@link Thread}.
+   *
+   * <p>This method is idempotent.</p>
+   *
+   * @param configuration the {@link Configuration} in question; may
+   * be {@code null} in which case no action is taken
+   *
+   * @see #isActive(Configuration)
+   *
+   * @see #activate(Configuration)
+   */
+  private final void deactivate(final Configuration configuration) {
+    if (configuration != null) {
+      this.currentlyActiveConfigurations.get().remove(configuration);
+    }
+    assert !this.isActive(configuration);
+  }
+
+  /**
+   * Returns {@code true} if all {@link Configuration} instances have
+   * been {@linkplain #deactivate(Configuration) deactivated}.
+   *
+   * @return {@code true} if all {@link Configuration} instances have
+   * been {@linkplain #deactivate(Configuration) deactivated}; {@code
+   * false} otherwise
+   *
+   * @see #isActive(Configuration)
+   *
+   * @see #deactivate(Configuration)
+   */
+  private final boolean allConfigurationsInactive() {
+    return this.currentlyActiveConfigurations.get().isEmpty();
+  }
+  
 }

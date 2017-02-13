@@ -18,7 +18,11 @@ package org.microbean.configuration.spi;
 
 import java.util.Map;
 
+import org.microbean.configuration.Configurations;
+
 public interface Configuration {
+
+  public void setConfigurations(final Configurations configurations);
   
   public ConfigurationValue getValue(final Map<String, String> coordinates, final String name);
   

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Properties;
 
-public class AbstractPropertiesConfiguration implements Configuration {
+public class AbstractPropertiesConfiguration extends AbstractConfiguration {
 
   private final Map<String, String> coordinates;
 

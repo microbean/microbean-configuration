@@ -26,8 +26,10 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.microbean.configuration.spi.AbstractConfiguration;
 import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationValue;
+import org.microbean.configuration.spi.ConfigurationCoordinates;
 import org.microbean.configuration.spi.SystemPropertiesConfiguration;
 import org.microbean.configuration.spi.TypeLiteral;
 
@@ -92,6 +94,7 @@ public class TestConfigurations {
     subConfigurations.add(experimentalPhaseAndTestEnvironmentConfiguration);
     subConfigurations.add(testEnvironmentConfiguration);
     subConfigurations.add(new SystemPropertiesConfiguration());
+    subConfigurations.add(new ConfigurationCoordinates());
     this.configurations = new Configurations(subConfigurations, null, null);
   }
 
@@ -107,7 +110,7 @@ public class TestConfigurations {
    */
   @Test
   public void testFirstSpike() {
-    final String value = this.configurations.getValue(null, "java.vendor");
+    final String value = this.configurations.getValue("java.vendor");
     assertEquals(System.getProperty("java.vendor"), value);
   }
 
@@ -145,7 +148,7 @@ public class TestConfigurations {
   @Test
   public void testAcquireCoordinates() {
     System.setProperty("configurationCoordinates", "{a=b,c=d}");
-    final Map<String, String> coordinates = this.configurations.getValue(null, "configurationCoordinates", new TypeLiteral<Map<String, String>>() {
+    final Map<String, String> coordinates = this.configurations.getValue("configurationCoordinates", new TypeLiteral<Map<String, String>>() {
         private static final long serialVersionUID = 1L; }.getType());
     assertNotNull(coordinates);
     assertEquals(2, coordinates.size());
@@ -160,7 +163,7 @@ public class TestConfigurations {
    */
 
   
-  public static final class PropertiesConfiguration implements Configuration {
+  public static final class PropertiesConfiguration extends AbstractConfiguration {
 
     private final Map<String, String> coordinates;
     

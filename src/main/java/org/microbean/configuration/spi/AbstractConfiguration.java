@@ -16,26 +16,23 @@
  */
 package org.microbean.configuration.spi;
 
-import java.util.Map;
-
 import org.microbean.configuration.Configurations;
 
-public class ConfigurationCoordinates extends AbstractConfiguration {  
-  
-  public ConfigurationCoordinates() {
+public abstract class AbstractConfiguration implements Configuration {
+
+  private Configurations configurations;
+
+  protected AbstractConfiguration() {
     super();
   }
 
   @Override
-  public ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
-    ConfigurationValue returnValue = null;
-    if (Configurations.CONFIGURATION_COORDINATES.equals(name)) {
-      final String configurationCoordinates = System.getProperty(Configurations.CONFIGURATION_COORDINATES);
-      if (configurationCoordinates != null) {
-        returnValue = new ConfigurationValue(this, null, name, configurationCoordinates, true);
-      }
-    }
-    return returnValue;
+  public void setConfigurations(final Configurations configurations) {
+    this.configurations = configurations;
+  }
+
+  public Configurations getConfigurations() {
+    return this.configurations;
   }
   
 }
