@@ -1,3 +1,4 @@
-*.class
-target/
 *~
+*.class
+src/site/markdown/*.md.html
+target/
