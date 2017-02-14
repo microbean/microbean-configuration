@@ -26,14 +26,8 @@ public final class StringToIntegerArrayConverter extends Converter<Integer[]> {
 
   private static final Integer[] EMPTY_INTEGER_ARRAY = new Integer[0];
 
-  private final StringToIntegerConverter scalarConverter;
+  private static final StringToIntegerConverter scalarConverter = new StringToIntegerConverter();
   
-  public StringToIntegerArrayConverter() {
-    super();
-    this.scalarConverter = new StringToIntegerConverter();
-    assert Integer[].class.equals(this.getType());
-  }
-
   @Override
   public final Integer[] convert(final String value) {
     Integer[] returnValue = null;

@@ -16,25 +16,112 @@
  */
 package org.microbean.configuration;
 
+import java.io.Serializable; // for javadoc only
+
 import java.lang.reflect.Type;
 
+import org.microbean.configuration.spi.Converter; // for javadoc only
+
+/**
+ * A {@link ConfigurationException} that indicates that a {@linkplain
+ * Converter#getType() suitable} {@link Converter} could not be found
+ * for a given {@link Type}.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public class NoSuchConverterException extends ConfigurationException {
 
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
   private static final long serialVersionUID = 1L;
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link Type} for which a {@linkplain Converter#getType()
+   * suitable} {@link Converter} could not be found.
+   *
+   * <p>This field may be {@code null}.</p>
+   */
   private final Type type;
+
+
+  /*
+   * Constructors.
+   */
   
+
+  /**
+   * Creates a new {@link NoSuchConverterException}.
+   */
   public NoSuchConverterException() {
     super();
     this.type = null;
   }
 
+  /**
+   * Creates a new {@link NoSuchConverterException}.
+   *
+   * @param type the {@link Type} for which a {@linkplain
+   * Converter#getType() suitable} {@link Converter} could not be
+   * found; may be {@code null}
+   *
+   * @see #getType()
+   */
+  public NoSuchConverterException(final Type type) {
+    super();
+    this.type = type;
+  }
+  
+  /**
+   * Creates a new {@link NoSuchConverterException}.
+   *
+   * @param message the error message; may be {@code null}
+   *
+   * @param cause the {@link Throwable} that caused this {@link
+   * NoSuchConverterException} to be created; may be {@code null}
+   *
+   * @param type the {@link Type} for which a {@linkplain
+   * Converter#getType() suitable} {@link Converter} could not be
+   * found; may be {@code null}
+   *
+   * @see #getType()
+   */
   public NoSuchConverterException(final String message, final Throwable cause, final Type type) {
     super(message, cause);
     this.type = type;
   }
 
-  public Type getType() {
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * Returns the {@link Type} for which a {@linkplain Converter#getType()
+   * suitable} {@link Converter} could not be found.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the {@link Type} for which a {@linkplain
+   * Converter#getType() suitable} {@link Converter} could not be
+   * found, or {@code null}
+   */
+  public final Type getType() {
     return this.type;
   }
   

@@ -16,22 +16,68 @@
  */
 package org.microbean.configuration;
 
+import java.io.Serializable; // for javadoc only
+
+import org.microbean.configuration.spi.Converter; // for javadoc only
+
+/**
+ * A {@link ConfigurationException} indicating that a problem was
+ * encountered during {@linkplain Converter#convert(String) type
+ * conversion}.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see Converter#convert(String)
+ */
 public class ConversionException extends ConfigurationException {
 
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
   private static final long serialVersionUID = 1L;
-  
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link ConversionException}.
+   */
   public ConversionException() {
     super();
   }
 
+  /**
+   * Creates a new {@link ConversionException}.
+   *
+   * @param message the error message; may be {@code null}
+   */
   public ConversionException(final String message) {
     super(message, null);
   }
-  
+
+  /**
+   * Creates a new {@link ConversionException}.
+   *
+   * @param cause the {@link Throwable} causing this {@link
+   * ConversionException}; may be {@code null}
+   */
   public ConversionException(final Throwable cause) {
     super(null, cause);
   }
-  
+
+  /**
+   * Creates a new {@link ConversionException}.
+   *
+   * @param message the error message; may be {@code null}
+   *
+   * @param cause the {@link Throwable} causing this {@link
+   * ConversionException}; may be {@code null}
+   */
   public ConversionException(final String message, final Throwable cause) {
     super(message, cause);
   }

@@ -99,10 +99,53 @@ public class ConfigurationValue implements Serializable {
    */
 
 
+  /**
+   * Creates a new {@link ConfigurationValue}.
+   *
+   * @param configuration the {@link Configuration} creating this
+   * {@link ConfigurationValue}; must not be {@code null}
+   *
+   * @param coordinates the configuration coordinates to which this
+   * {@link ConfigurationValue} applies; must be a subset of the
+   * configuration coordinates that resulted in this {@link
+   * ConfigurationValue} being created; may be {@code null}
+   *
+   * @param name the name of the configuration property for which this
+   * is a value; must not be {@code null}
+   *
+   * @param value the value; may be {@code null}
+   *
+   * @exception NullPointerException if either {@code configuration}
+   * or {@code name} is {@code null}
+   *
+   * @see #ConfigurationValue(Configuration, Map, String, String, boolean)
+   */
   public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value) {
     this(configuration, coordinates, name, value, false);
   }
-  
+
+   /**
+   * Creates a new {@link ConfigurationValue}.
+   *
+   * @param configuration the {@link Configuration} creating this
+   * {@link ConfigurationValue}; must not be {@code null}
+   *
+   * @param coordinates the configuration coordinates to which this
+   * {@link ConfigurationValue} applies; must be a subset of the
+   * configuration coordinates that resulted in this {@link
+   * ConfigurationValue} being created; may be {@code null}
+   *
+   * @param name the name of the configuration property for which this
+   * is a value; must not be {@code null}
+   *
+   * @param value the value; may be {@code null}
+   *
+   * @param authoritative whether this {@link ConfigurationValue} is
+   * to be considered authoritative
+   *
+   * @exception NullPointerException if either {@code configuration}
+   * or {@code name} is {@code null}
+   */
   public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value, final boolean authoritative) {
     super();
     Objects.requireNonNull(configuration);
@@ -118,26 +161,87 @@ public class ConfigurationValue implements Serializable {
     this.authoritative = authoritative;
   }
 
-  public Configuration getConfiguration() {
+
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns the {@link Configuration} that created this {@link
+   * ConfigurationValue}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link Configuration} that created this {@link
+   * ConfigurationValue}; never {@code null}
+   */
+  public final Configuration getConfiguration() {
     return this.configuration;
   }
 
-  public Map<String, String> getCoordinates() {
+  /**
+   * Returns the configuration coordinates locating this {@link
+   * ConfigurationValue} in configuration space.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the configuration coordinates locating this {@link
+   * ConfigurationValue} in configuration space, or {@code null}
+   */
+  public final Map<String, String> getCoordinates() {
     return this.coordinates;
   }
 
-  public String getName() {
+  /**
+   * Returns the name of the configuration property for which this
+   * {@link ConfigurationValue} is a value.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the name of the configuration property for which this
+   * {@link ConfigurationValue} is a value; never {@code null}
+   */
+  public final String getName() {
     return this.name;
   }
-  
-  public String getValue() {
+
+  /**
+   * Returns the actual value that this {@link ConfigurationValue}
+   * represents.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the actual value that this {@link ConfigurationValue}
+   * represents, or {@code null}
+   */
+  public final String getValue() {
     return this.value;
   }
 
-  public boolean isAuthoritative() {
+  /**
+   * Returns {@code true} if this {@link ConfigurationValue} is to be
+   * regarded as authoritative.
+   *
+   * @return {@code true} if this {@link ConfigurationValue} is to be
+   * regarded as authoritative; {@code false} otherwise
+   */
+  public final boolean isAuthoritative() {
     return this.authoritative;
   }
 
+  /**
+   * Returns the <em>specificity</em> of this {@link
+   * ConfigurationValue}.
+   *
+   * <p>The specificity of a {@link ConfigurationValue} is equal to
+   * the {@linkplain Map#size() size} of its {@linkplain
+   * #getCoordinates() configuration coordinates
+   * <code>Map</code>}.</p>
+   *
+   * @return the specificity of this {@link ConfigurationValue};
+   * always zero or a positive integer
+   */
   public final int specificity() {
     int size = 0;
     final Map<?, ?> coordinates = this.getCoordinates();
@@ -146,7 +250,12 @@ public class ConfigurationValue implements Serializable {
     }
     return size;
   }
-  
+
+  /**
+   * Returns a hashcode for this {@link ConfigurationValue}.
+   *
+   * @return a hashcode for this {@link ConfigurationValue}
+   */
   @Override
   public int hashCode() {
     int hashCode = 17;
@@ -169,6 +278,31 @@ public class ConfigurationValue implements Serializable {
     return hashCode;
   }
 
+  /**
+   * Returns {@code true} if the supplied {@link Object} is equal to
+   * this {@link ConfigurationValue}.
+   *
+   * <p>An {@link Object} is equal to a {@link ConfigurationValue}
+   * if:</p>
+   *
+   * <ul>
+   *
+   * <li>It is an instance of {@link ConfigurationValue}</li>
+   *
+   * <li>Its {@linkplain #getName() name} and {@link #getCoordinates()
+   * coordinates} are equal to those of the {@link ConfigurationValue}
+   * to which it is being compared</li>
+   *
+   * <li>Its {@linkplain #getValue() value} is equal to that of the
+   * {@link ConfigurationValue} to which it is being compared</li>
+   *
+   * </ul>
+   *
+   * @param other the {@link Object} to test; may be {@code null}
+   *
+   * @return {@code true} if the supplied {@link Object} is equal to
+   * this {@link ConfigurationValue}; {@code false} otherwise
+   */
   @Override
   public boolean equals(final Object other) {
     if (other == this) {
@@ -212,6 +346,17 @@ public class ConfigurationValue implements Serializable {
     }
   }
   
+  /**
+   * Returns a non-{@code null} {@link String} representation of this
+   * {@link ConfigurationValue}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * @return a non-{@code null} {@link String} representation of this
+   * {@link ConfigurationValue}
+   */
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
@@ -226,6 +371,10 @@ public class ConfigurationValue implements Serializable {
     sb.append(this.getName());
     sb.append("=");
     sb.append(this.getValue());
+    final boolean authoritative = this.isAuthoritative();
+    if (authoritative) {
+      sb.append(" (authoritative)");
+    }
     return sb.toString();
   }
   

@@ -16,31 +16,28 @@
  */
 package org.microbean.configuration.spi.converter;
 
-import java.util.Arrays;
+import java.time.Instant;
+
+import java.util.Calendar;
 
 import org.microbean.configuration.spi.Converter;
 
-public final class StringToIntArrayConverter extends Converter<int[]> {
+public final class StringToCalendarConverter extends Converter<Calendar> {
 
   private static final long serialVersionUID = 1L;
 
-  private static final int[] EMPTY_INT_ARRAY = new int[0];
+  private static final StringToInstantConverter stringToInstantConverter = new StringToInstantConverter();
 
-  private static final StringToIntegerConverter scalarConverter = new StringToIntegerConverter();
-  
   @Override
-  public final int[] convert(final String value) {
-    int[] returnValue = null;
-    if (value != null) {
-      if (value.isEmpty()) {
-        returnValue = EMPTY_INT_ARRAY;
-      } else {
-        returnValue = Arrays.stream(value.split(","))
-          .map(String::trim)
-          .filter(s -> !s.isEmpty())
-          .mapToInt(scalarConverter::convert)
-          .toArray();
-      }
+  public final Calendar convert(final String value) {
+    final Instant instant = stringToInstantConverter.convert(value);
+    final Calendar returnValue;
+    if (instant == null) {
+      returnValue = null;
+    } else {
+      returnValue = Calendar.getInstance();
+      assert returnValue != null;
+      returnValue.setTimeInMillis(instant.toEpochMilli());
     }
     return returnValue;
   }

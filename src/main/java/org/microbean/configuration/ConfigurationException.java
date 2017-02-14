@@ -16,14 +16,50 @@
  */
 package org.microbean.configuration;
 
+import java.io.Serializable;
+
+/**
+ * A {@link RuntimeException} indicating that a MicroBean
+ * Configuration-related error has occurred.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public class ConfigurationException extends RuntimeException {
 
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
   private static final long serialVersionUID = 1L;
-  
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link ConfigurationException}.
+   */
   public ConfigurationException() {
     super();
   }
 
+  /**
+   * Creates a new {@link ConfigurationException}.
+   *
+   * @param message the error message; may be {@code null}
+   *
+   * @param cause the {@link Throwable} that caused this {@link
+   * ConfigurationException} to be created; may be {@code null}
+   */
   public ConfigurationException(final String message, final Throwable cause) {
     super(message, cause);
   }

@@ -463,6 +463,11 @@ public class Configurations {
    *
    * @exception NullPointerException if {@code name} is {@code null}
    *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final String getValue(final String name) {
@@ -485,6 +490,11 @@ public class Configurations {
    * @return the configuration value, or {@code null}
    *
    * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -509,6 +519,11 @@ public class Configurations {
    * @return the configuration value, or {@code null}
    *
    * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -537,6 +552,11 @@ public class Configurations {
    * @return the configuration value, or {@code null}
    *
    * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -569,6 +589,14 @@ public class Configurations {
    * @exception NoSuchConverterException if there is no {@link
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -604,6 +632,14 @@ public class Configurations {
    * @exception NoSuchConverterException if there is no {@link
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -641,6 +677,14 @@ public class Configurations {
    * @exception NoSuchConverterException if there is no {@link
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -683,6 +727,14 @@ public class Configurations {
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
    *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Class<T> type, final String defaultValue) {
@@ -715,6 +767,14 @@ public class Configurations {
    * @exception NoSuchConverterException if there is no {@link
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -752,6 +812,14 @@ public class Configurations {
    * @exception NoSuchConverterException if there is no {@link
    * Converter} available that {@linkplain Converter#getType()
    * handles} the supplied {@code type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -791,6 +859,14 @@ public class Configurations {
    * Converter} available that {@linkplain Converter#getType()
    * handles} the {@link Type} represented by the supplied {@code
    * typeLiteral}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -834,6 +910,14 @@ public class Configurations {
    * handles} the {@link Type} represented by the supplied {@code
    * typeLiteral}
    *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
@@ -866,6 +950,14 @@ public class Configurations {
    * Converter} available that {@linkplain Converter#getType()
    * handles} the {@link Type} represented by the supplied {@code
    * type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -905,6 +997,14 @@ public class Configurations {
    * handles} the {@link Type} represented by the supplied {@code
    * type}
    *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final <T> T getValue(final String name, final Type type, final String defaultValue) {
@@ -942,6 +1042,14 @@ public class Configurations {
    * Converter} available that {@linkplain Converter#getType()
    * handles} the {@link Type} represented by the supplied {@code
    * type}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -986,13 +1094,21 @@ public class Configurations {
    * handles} the {@link Type} represented by the supplied {@code
    * type}
    *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Type type, final String defaultValue) {
     @SuppressWarnings("unchecked")
     final Converter<T> converter = (Converter<T>)this.converters.get(type);
     if (converter == null) {
-      throw new NoSuchConverterException(null, null, type);
+      throw new NoSuchConverterException(type);
     }
     return this.getValue(configurationCoordinates, name, converter, defaultValue);
   }
@@ -1019,6 +1135,14 @@ public class Configurations {
    *
    * @exception NullPointerException if {@code name} or {@code
    * converter} is {@code null}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -1053,6 +1177,14 @@ public class Configurations {
    *
    * @exception NullPointerException if {@code name} or {@code
    * converter} is {@code null}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
+   *
+   * @exception AmbiguousConfigurationValuesException if two or more
+   * values were found that could be suitable and arbitration
+   * {@linkplain #performArbitration(Map, String, Collection) was
+   * performed} but could not resolve the dispute
    *
    * @see #getValue(Map, String, Converter, String)
    */
@@ -1089,6 +1221,9 @@ public class Configurations {
    *
    * @exception NullPointerException if either {@code name} or {@code
    * converter} is {@code null}
+   *
+   * @exception ConversionException if type conversion could not occur
+   * for any reason
    *
    * @exception AmbiguousConfigurationValuesException if two or more
    * values were found that could be suitable and arbitration
@@ -1522,32 +1657,142 @@ public class Configurations {
     return this.currentlyActiveConfigurations.get().isEmpty();
   }
 
+
+  /*
+   * Inner and nested classes.
+   */
+
+
+  /**
+   * An {@link ELResolver} that resolves a {@code configurations}
+   * top-level object in the Expression Language and resolves its
+   * properties by treating them as the names of configuration
+   * properties.
+   *
+   * @author <a href="http://about.me/lairdnelson"
+   * target="_parent">Laird Nelson</a>
+   *
+   * @see ELResolver
+   *
+   * @see StandardELContext#addELResolver(ELResolver)
+   */
   private final class ConfigurationELResolver extends ELResolver {
 
+
+    /*
+     * Constructors.
+     */
+
+    /**
+     * Creates a new {@link ConfigurationELResolver}.
+     */
     private ConfigurationELResolver() {
       super();
     }
 
+    /**
+     * Returns {@link Class Object.class} when invoked.
+     *
+     * @param elContext the {@link ELContext} in effect; ignored
+     *
+     * @param base the base {@link Object} in effect; ignored
+     *
+     * @return {@link Class Object.class} when invoked
+     *
+     * @see ELResolver#getCommonPropertyType(ELContext, Object)
+     */
     @Override
     public final Class<?> getCommonPropertyType(final ELContext elContext, final Object base) {
       return Object.class;
     }
 
+    /**
+     * Returns {@code null} when invoked.
+     *
+     * @param elContext the {@link ELContext} in effect; ignored
+     *
+     * @param base the base {@link Object} in effect; ignored
+     *
+     * @return {@code null} when invoked
+     *
+     * @see ELResolver#getFeatureDescriptors(ELContext, Object)
+     */
     @Override
     public final Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext elContext, final Object base) {
       return null;
     }
 
+    /**
+     * Calls {@link ELContext#setPropertyResolved(boolean)
+     * elContext.setPropertyResolved(true)} and returns {@code true}
+     * when invoked.
+     *
+     * @param elContext the {@link ELContext} in effect; ignored
+     *
+     * @param base the base {@link Object} in effect; ignored
+     *
+     * @param property the property in effect; ignored
+     *
+     * @return {@code true} when invoked
+     *
+     * @see ELContext#setPropertyResolved(boolean)
+     *
+     * @see ELResolver#isReadOnly(ELContext, Object, Object)
+     */
     @Override
     public final boolean isReadOnly(final ELContext elContext, final Object base, final Object property) {
-      if (elContext != null) {
+      if (elContext != null && (property instanceof String || property instanceof Configurations)) {
         elContext.setPropertyResolved(true);
       }
       return true;
     }
 
+    /**
+     * Returns a {@link Class} representing the type of object that
+     * the supplied {@code base}/{@code property} pair represents.
+     *
+     * <p>This method may return {@code null}.</p>
+     *
+     * <p>If the supplied {@code base} is {@code null} and the
+     * supplied {@code property} is a {@link String} equal to "{@code
+     * configurations}", then this method returns {@link Class
+     * Configurations.class}.</p>
+     *
+     * <p>If the supplied {@code base} is an instance of {@link
+     * Configurations} and the supplied {@code property} is a {@link
+     * String}, then the {@code property} is treated as the name of a
+     * configuration property, and the {@link
+     * Configurations#getValue(String)} method is invoked on the
+     * {@code base} object with it.  If the return value of that
+     * method invocation is {@code null}, then a {@link
+     * PropertyNotFoundException} is thrown; otherwise {@link Class
+     * String.class} is returned.</p>
+     *
+     * <p>This method returns {@code null} in all other cases.</p>
+     *
+     * @param elContext the {@link ELContext} in effect; must not be
+     * {@code null}
+     *
+     * @param base the base; may be {@code null}
+     *
+     * @param property the property; may be {@code null}
+     *
+     * @return {@link Class String.class} or {@code null}
+     *
+     * @exception NullPointerException if {@code elContext} is {@code
+     * null}
+     *
+     * @exception PropertyNotFoundException if {@code property} is a
+     * {@link String} but does not identify a configuration property
+     * that has a value
+     *
+     * @see ELResolver#getType(ELContext, Object, Object)
+     *
+     * @see Configurations#getValue(String)
+     */
     @Override
     public final Class<?> getType(final ELContext elContext, final Object base, final Object property) {
+      Objects.requireNonNull(elContext);
       Class<?> returnValue = null;
       if (base == null) {
         if ("configurations".equals(property)) {
@@ -1562,15 +1807,57 @@ public class Configurations {
             throw new PropertyNotFoundException((String)property);
           }
           returnValue = String.class;
-        } else {
-          throw new UnsupportedOperationException("getType(); base: " + base + "; property: " + property);
         }
-      } else {
-        throw new UnsupportedOperationException("getType(); base: " + base + "; property: " + property);
       }
       return returnValue;      
     }
 
+     /**
+     * Returns the proper value for the supplied {@code base}/{@code
+     * property} pair.
+     *
+     * <p>This method may return {@code null}.</p>
+     *
+     * <p>If the supplied {@code base} is {@code null} and the
+     * supplied {@code property} is a {@link String} equal to "{@code
+     * configurations}", then this method returns the {@link
+     * Configurations} object housing this {@link ELResolver}
+     * implementation.</p>
+     *
+     * <p>If the supplied {@code base} is an instance of {@link
+     * Configurations} and the supplied {@code property} is a {@link
+     * String}, then the {@code property} is treated as the name of a
+     * configuration property, and the {@link
+     * Configurations#getValue(String)} method is invoked on the
+     * {@code base} object with it.  If the return value of that
+     * method invocation is {@code null}, then a {@link
+     * PropertyNotFoundException} is thrown; otherwise the return
+     * value of its {@link ConfigurationValue#getValue()} method is
+     * returned.</p>
+     *
+     * <p>This method returns {@code null} in all other cases.</p>
+     *
+     * @param elContext the {@link ELContext} in effect; must not be
+     * {@code null}
+     *
+     * @param base the base; may be {@code null}
+     *
+     * @param property the property; may be {@code null}
+     *
+     * @return a {@link Configurations} object, a {@link String} or
+     * {@code null}
+     *
+     * @exception NullPointerException if {@code elContext} is {@code
+     * null}
+     *
+     * @exception PropertyNotFoundException if {@code property} is a
+     * {@link String} but does not identify a configuration property
+     * that has a value
+     *
+     * @see ELResolver#getValue(ELContext, Object, Object)
+     *
+     * @see Configurations#getValue(String)
+     */
     @Override
     public final Object getValue(final ELContext elContext, final Object base, final Object property) {
       Objects.requireNonNull(elContext);
@@ -1582,18 +1869,32 @@ public class Configurations {
         }
       } else if (base instanceof Configurations) {
         if (property instanceof String) {
-          returnValue = ((Configurations)base).getValue((String)property);
+          final String configurationPropertyName = (String)property;
+          returnValue = ((Configurations)base).getValue(configurationPropertyName);
           elContext.setPropertyResolved(true);
           if (returnValue == null) {
-            throw new PropertyNotFoundException((String)property);
+            throw new PropertyNotFoundException(configurationPropertyName);
           }          
         }
-      } else {
-        throw new UnsupportedOperationException("getValue(); base: " + base + "; property: " + property);
       }
       return returnValue;
     }
 
+    /**
+     * Effectively does nothing when invoked.
+     *
+     * @param elContext the {@link ELContext} in effect; ignored; may be {@code null}
+     *
+     * @param base the base; ignored; may be {@code null}
+     *
+     * @param property the property; ignored; may be {@code null}
+     *
+     * @param value the value; ignored; may be {@code null}
+     *
+     * @see ELResolver#setValue(ELContext, Object, Object, Object)
+     *
+     * @see #isReadOnly(ELContext, Object, Object)
+     */
     @Override
     public final void setValue(final ELContext elContext, final Object base, final Object property, final Object value) {
       if (elContext != null) {
