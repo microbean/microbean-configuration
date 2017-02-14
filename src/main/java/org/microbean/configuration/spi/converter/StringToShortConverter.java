@@ -14,19 +14,19 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.time.LocalDate;
+import org.microbean.configuration.spi.Converter;
 
-public final class StringToLocalDateConverter extends Converter<LocalDate> {
+public final class StringToShortConverter extends Converter<Short> {
 
   private static final long serialVersionUID = 1L;
   
   @Override
-  public final LocalDate convert(final String value) {
-    LocalDate returnValue = null;
+  public final Short convert(final String value) {
+    Short returnValue = null;
     if (value != null) {
-      returnValue = LocalDate.parse(value);
+      returnValue = Short.valueOf(value);
     }
     return returnValue;
   }

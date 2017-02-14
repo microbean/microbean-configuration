@@ -14,19 +14,27 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
 
-public final class StringToInstantConverter extends Converter<Instant> {
+import java.util.stream.Collectors;
+
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToStringCollectionConverter extends Converter<Collection<String>> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public final Instant convert(final String value) {
-    Instant returnValue = null;
+  public final Collection<String> convert(final String value) {
+    Collection<String> returnValue = null;
     if (value != null) {
-      returnValue = Instant.parse(value);
+      returnValue = Arrays.stream(value.split(","))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty())
+        .collect(Collectors.toList());
     }
     return returnValue;
   }

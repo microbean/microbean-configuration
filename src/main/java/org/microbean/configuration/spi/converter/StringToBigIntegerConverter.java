@@ -14,19 +14,21 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.net.URI;
+import java.math.BigInteger;
 
-public final class StringToURIConverter extends Converter<URI> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToBigIntegerConverter extends Converter<BigInteger> {
 
   private static final long serialVersionUID = 1L;
-  
+
   @Override
-  public final URI convert(final String value) {
-    URI returnValue = null;
+  public final BigInteger convert(final String value) {
+    BigInteger returnValue = null;
     if (value != null) {
-      returnValue = URI.create(value);
+      returnValue = new BigInteger(value);
     }
     return returnValue;
   }

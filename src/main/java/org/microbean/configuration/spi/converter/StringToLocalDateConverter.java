@@ -14,17 +14,21 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToDoubleConverter extends Converter<Double> {
+import java.time.LocalDate;
+
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToLocalDateConverter extends Converter<LocalDate> {
 
   private static final long serialVersionUID = 1L;
-
+  
   @Override
-  public final Double convert(final String value) {
-    Double returnValue = null;
+  public final LocalDate convert(final String value) {
+    LocalDate returnValue = null;
     if (value != null) {
-      returnValue = Double.valueOf(value);
+      returnValue = LocalDate.parse(value);
     }
     return returnValue;
   }

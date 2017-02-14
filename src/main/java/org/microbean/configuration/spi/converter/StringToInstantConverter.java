@@ -14,19 +14,21 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 
-public final class StringToBigDecimalConverter extends Converter<BigDecimal> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToInstantConverter extends Converter<Instant> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public final BigDecimal convert(final String value) {
-    BigDecimal returnValue = null;
+  public final Instant convert(final String value) {
+    Instant returnValue = null;
     if (value != null) {
-      returnValue = new BigDecimal(value);
+      returnValue = Instant.parse(value);
     }
     return returnValue;
   }

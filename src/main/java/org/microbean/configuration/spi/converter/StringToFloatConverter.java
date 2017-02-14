@@ -14,17 +14,19 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToLongConverter extends Converter<Long> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToFloatConverter extends Converter<Float> {
 
   private static final long serialVersionUID = 1L;
-  
+
   @Override
-  public final Long convert(final String value) {
-    Long returnValue = null;
+  public final Float convert(final String value) {
+    Float returnValue = null;
     if (value != null) {
-      returnValue = Long.valueOf(value);
+      returnValue = Float.valueOf(value);
     }
     return returnValue;
   }

@@ -14,26 +14,21 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.math.BigDecimal;
 
-import org.microbean.configuration.ConversionException;
+import org.microbean.configuration.spi.Converter;
 
-public final class StringToURLConverter extends Converter<URL> {
+public final class StringToBigDecimalConverter extends Converter<BigDecimal> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public final URL convert(final String value) {
-    URL returnValue = null;
+  public final BigDecimal convert(final String value) {
+    BigDecimal returnValue = null;
     if (value != null) {
-      try {
-        returnValue = new URL(value);
-      } catch (final MalformedURLException kaboom) {
-        throw new ConversionException(kaboom);
-      }
+      returnValue = new BigDecimal(value);
     }
     return returnValue;
   }

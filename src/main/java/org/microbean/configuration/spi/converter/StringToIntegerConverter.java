@@ -14,17 +14,19 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToShortConverter extends Converter<Short> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToIntegerConverter extends Converter<Integer> {
 
   private static final long serialVersionUID = 1L;
   
   @Override
-  public final Short convert(final String value) {
-    Short returnValue = null;
+  public final Integer convert(final String value) {
+    Integer returnValue = null;
     if (value != null) {
-      returnValue = Short.valueOf(value);
+      returnValue = Integer.valueOf(value);
     }
     return returnValue;
   }

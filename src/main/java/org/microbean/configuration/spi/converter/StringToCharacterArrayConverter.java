@@ -14,17 +14,25 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToBooleanConverter extends Converter<Boolean> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToCharacterArrayConverter extends Converter<Character[]> {
 
   private static final long serialVersionUID = 1L;
+
+  private static final Character[] EMPTY_CHARACTER_ARRAY = new Character[0];
   
   @Override
-  public final Boolean convert(final String value) {
-    Boolean returnValue = null;
+  public final Character[] convert(final String value) {
+    Character[] returnValue = null;
     if (value != null) {
-      returnValue = Boolean.valueOf(value);
+      if (value.isEmpty()) {
+        returnValue = EMPTY_CHARACTER_ARRAY;
+      } else {
+        returnValue = value.chars().mapToObj(c -> (char)c).toArray(Character[]::new);
+      }
     }
     return returnValue;
   }

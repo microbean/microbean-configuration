@@ -14,17 +14,21 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToIntegerConverter extends Converter<Integer> {
+import java.net.URI;
+
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToURIConverter extends Converter<URI> {
 
   private static final long serialVersionUID = 1L;
   
   @Override
-  public final Integer convert(final String value) {
-    Integer returnValue = null;
+  public final URI convert(final String value) {
+    URI returnValue = null;
     if (value != null) {
-      returnValue = Integer.valueOf(value);
+      returnValue = URI.create(value);
     }
     return returnValue;
   }

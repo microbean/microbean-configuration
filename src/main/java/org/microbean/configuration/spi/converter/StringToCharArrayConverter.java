@@ -14,36 +14,24 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.util.Arrays;
+import org.microbean.configuration.spi.Converter;
 
-public final class StringToIntegerArrayConverter extends Converter<Integer[]> {
+public final class StringToCharArrayConverter extends Converter<char[]> {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Integer[] EMPTY_INTEGER_ARRAY = new Integer[0];
-
-  private final StringToIntegerConverter scalarConverter;
+  private static final char[] EMPTY_CHAR_ARRAY = new char[0];
   
-  public StringToIntegerArrayConverter() {
-    super();
-    this.scalarConverter = new StringToIntegerConverter();
-    assert Integer[].class.equals(this.getType());
-  }
-
   @Override
-  public final Integer[] convert(final String value) {
-    Integer[] returnValue = null;
+  public final char[] convert(final String value) {
+    char[] returnValue = null;
     if (value != null) {
       if (value.isEmpty()) {
-        returnValue = EMPTY_INTEGER_ARRAY;
+        returnValue = EMPTY_CHAR_ARRAY;
       } else {
-        returnValue = Arrays.stream(value.split(","))
-          .map(String::trim)
-          .filter(s -> !s.isEmpty())
-          .map(scalarConverter::convert)
-          .toArray(Integer[]::new);
+        returnValue = value.toCharArray();
       }
     }
     return returnValue;

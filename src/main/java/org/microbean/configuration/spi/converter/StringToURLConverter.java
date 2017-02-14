@@ -14,22 +14,27 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-public final class StringToCharacterArrayConverter extends Converter<Character[]> {
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.microbean.configuration.ConversionException;
+
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToURLConverter extends Converter<URL> {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Character[] EMPTY_CHARACTER_ARRAY = new Character[0];
-  
   @Override
-  public final Character[] convert(final String value) {
-    Character[] returnValue = null;
+  public final URL convert(final String value) {
+    URL returnValue = null;
     if (value != null) {
-      if (value.isEmpty()) {
-        returnValue = EMPTY_CHARACTER_ARRAY;
-      } else {
-        returnValue = value.chars().mapToObj(c -> (char)c).toArray(Character[]::new);
+      try {
+        returnValue = new URL(value);
+      } catch (final MalformedURLException kaboom) {
+        throw new ConversionException(kaboom);
       }
     }
     return returnValue;

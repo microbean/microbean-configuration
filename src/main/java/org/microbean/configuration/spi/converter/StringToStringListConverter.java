@@ -14,20 +14,22 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import java.util.stream.Collectors;
 
-public final class StringToStringCollectionConverter extends Converter<Collection<String>> {
+import org.microbean.configuration.spi.Converter;
+
+public final class StringToStringListConverter extends Converter<List<String>> {
 
   private static final long serialVersionUID = 1L;
-
+  
   @Override
-  public final Collection<String> convert(final String value) {
-    Collection<String> returnValue = null;
+  public final List<String> convert(final String value) {
+    List<String> returnValue = null;
     if (value != null) {
       returnValue = Arrays.stream(value.split(","))
         .map(String::trim)

@@ -14,25 +14,19 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.util.Arrays;
-import java.util.List;
+import org.microbean.configuration.spi.Converter;
 
-import java.util.stream.Collectors;
-
-public final class StringToStringListConverter extends Converter<List<String>> {
+public final class StringToBooleanConverter extends Converter<Boolean> {
 
   private static final long serialVersionUID = 1L;
   
   @Override
-  public final List<String> convert(final String value) {
-    List<String> returnValue = null;
+  public final Boolean convert(final String value) {
+    Boolean returnValue = null;
     if (value != null) {
-      returnValue = Arrays.stream(value.split(","))
-        .map(String::trim)
-        .filter(s -> !s.isEmpty())
-        .collect(Collectors.toList());
+      returnValue = Boolean.valueOf(value);
     }
     return returnValue;
   }

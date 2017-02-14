@@ -14,7 +14,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.microbean.configuration.ConversionException;
+
+import org.microbean.configuration.spi.Converter;
 
 public final class StringToMapStringStringConverter extends Converter<Map<String, String>> {
 

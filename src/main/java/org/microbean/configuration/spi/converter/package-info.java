@@ -14,15 +14,15 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
 
-public final class StringToStringConverter extends Converter<String> {
-
-  private static final long serialVersionUID = 1L;
-  
-  @Override
-  public final String convert(final String value) {
-    return value;
-  }
-  
-}
+/**
+ * Provides implementations of the {@link
+ * org.microbean.configuration.spi.Converter} interface included as
+ * part of the MicroBean Configuration framework.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see org.microbean.configuration.spi.Converter
+ */
+package org.microbean.configuration.spi.converter;

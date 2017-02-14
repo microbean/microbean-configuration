@@ -14,21 +14,17 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.configuration.spi;
+package org.microbean.configuration.spi.converter;
 
-import java.math.BigInteger;
+import org.microbean.configuration.spi.Converter;
 
-public final class StringToBigIntegerConverter extends Converter<BigInteger> {
+public final class StringToStringConverter extends Converter<String> {
 
   private static final long serialVersionUID = 1L;
-
+  
   @Override
-  public final BigInteger convert(final String value) {
-    BigInteger returnValue = null;
-    if (value != null) {
-      returnValue = new BigInteger(value);
-    }
-    return returnValue;
+  public final String convert(final String value) {
+    return value;
   }
   
 }
