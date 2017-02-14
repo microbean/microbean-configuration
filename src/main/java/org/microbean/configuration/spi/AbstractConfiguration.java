@@ -18,19 +18,75 @@ package org.microbean.configuration.spi;
 
 import org.microbean.configuration.Configurations;
 
+/**
+ * A skeletal implementation of the {@link Configuration} interface.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public abstract class AbstractConfiguration implements Configuration {
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link Configurations} governing this {@link Configuration}.
+   *
+   * <p>This field may be {@code null}.</p>
+   *
+   * @see #getConfigurations()
+   *
+   * @see #setConfigurations(Configurations)
+   */
   private Configurations configurations;
 
+
+  /*
+   * Constructors.
+   */
+  
+
+  /**
+   * Creates a new {@link AbstractConfiguration}.
+   */
   protected AbstractConfiguration() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * Installs the supplied {@link Configurations} on this {@link
+   * AbstractConfiguration} implementation.
+   *
+   * @param configurations the {@link Configurations} to install; may
+   * be {@code null}
+   *
+   * @see #getConfigurations()
+   */
   @Override
   public void setConfigurations(final Configurations configurations) {
     this.configurations = configurations;
   }
 
+  /**
+   * Returns the {@link Configurations} installed on this {@link
+   * AbstractConfiguration} implementation.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the {@link Configurations} installed on this {@link
+   * AbstractConfiguration} implementation, or {@code null}
+   *
+   * @see #setConfigurations(Configurations)
+   */
   public Configurations getConfigurations() {
     return this.configurations;
   }

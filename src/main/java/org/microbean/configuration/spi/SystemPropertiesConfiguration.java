@@ -20,8 +20,32 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An {@link AbstractConfiguration} that houses {@linkplain
+ * System#getProperties() System properties} and hence, by definition,
+ * minimally {@linkplain ConfigurationValue#specificity() specific}
+ * {@link ConfigurationValue}s representing them.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public class SystemPropertiesConfiguration extends AbstractConfiguration {
 
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * A {@link Set} of {@linkplain System#getProperties() System
+   * properties} that the Java Language Specification guarantees will
+   * exist on all platforms.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see System#getProperties()
+   */
   private static final Set<String> systemPropertiesGuaranteedToExist = new HashSet<>(29, 1F);
 
   static {
@@ -55,11 +79,45 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration {
     systemPropertiesGuaranteedToExist.add("user.home"); // User's home directory
     systemPropertiesGuaranteedToExist.add("user.dir"); // User's current working directory
   }
+
+
+  /*
+   * Constructors.
+   */
   
+
+  /**
+   * Creates a new {@link SystemPropertiesConfiguration}.
+   */
   public SystemPropertiesConfiguration() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns a {@link ConfigurationValue} representing the {@linkplain
+   * System#getProperty(String, String) System property} identified by
+   * the supplied {@code name}, or {@code null}.
+   *
+   * <p>The {@link ConfigurationValue} returned will be marked as
+   * {@linkplain ConfigurationValue#isAuthoritative() authoritative}
+   * if it is one of the {@linkplain System#getProperties() System
+   * properties guaranteed by the Java Language Specification to exist
+   * on every available Java platform}.</p>
+   *
+   * @param coordinates the configuration coordinates in effect for
+   * the current request; may be {@code null}
+   *
+   * @param name the name of the configuration property for which to
+   * return a {@link ConfigurationValue}; may be {@code null}
+   *
+   * @return a {@link ConfigurationValue}, or {@code null}
+   */
   @Override
   public ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
     ConfigurationValue returnValue = null;
@@ -72,6 +130,21 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration {
     return returnValue;
   }
 
+  /**
+   * Returns {@code true} if the supplied {@code name} is not {@code
+   * null} and is one of the {@linkplain System#getProperties() System
+   * properties guaranteed by the Java Language Specification to exist
+   * on every available Java platform}.
+   *
+   * @param name the name of a {@linkplain System#getProperty(String,
+   * String) System property}; may be {@code null} in which case
+   * {@code false} will be returned
+   *
+   * @return {@code true} if any value that this {@link
+   * SystemPropertiesConfiguration} produces for the supplied {@code
+   * name} is to be regarded as the authoritative value; {@code false}
+   * otherwise
+   */
   protected boolean isAuthoritative(final String name) {
     return name != null && systemPropertiesGuaranteedToExist.contains(name);
   }

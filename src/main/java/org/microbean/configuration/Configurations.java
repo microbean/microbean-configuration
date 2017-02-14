@@ -88,6 +88,22 @@ public class Configurations {
    */
   public static final String CONFIGURATION_COORDINATES = "configurationCoordinates";
 
+  /**
+   * A deliberately non-{@code static} {@link ThreadLocal} containing
+   * a {@link Set} of {@link Configuration}s that are currently in the
+   * process of executing their {@link Configuration#getValue(Map,
+   * String)} methods.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see #getValue(Map, String, Converter, String)
+   *
+   * @see #activate(Configuration)
+   *
+   * @see #deactivate(Configuration)
+   *
+   * @see #isActive(Configuration)
+   */
   private final ThreadLocal<Set<Configuration>> currentlyActiveConfigurations;
   
 
@@ -95,18 +111,68 @@ public class Configurations {
    * Instance fields.
    */
 
+  
+  /**
+   * Whether this {@link Configurations} has been initialized.
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   private final boolean initialized;
 
+  /**
+   * The {@link Collection} of {@link Configuration} instances that
+   * can {@linkplain Configuration#getValue(Map, String) provide}
+   * configuration values.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   private final Collection<Configuration> configurations;
 
+  /**
+   * The {@link Collection} of {@link Arbiter}s that can resolve
+   * otherwise ambiguous configuration values.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   private final Collection<Arbiter> arbiters;
 
+  /**
+   * A {@link Map} of {@link Converter} instances, indexed under
+   * {@linkplain Converter#getType() their <code>Type</code>}.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see #Configurations(Collection, Collection, Collection)
+   */
   private final Map<Type, Converter<?>> converters;
 
+  /**
+   * A {@link Map} representing the <em>configuration coordinates</em>
+   * of the application using this {@link Configurations}.
+   *
+   * <p>This field may be {@code null}.</p>
+   *
+   * @see #getConfigurationCoordinates()
+   */
   private final Map<String, String> configurationCoordinates;
 
+  /**
+   * An {@link ELContext} used for Expression Language evaluation.
+   *
+   * <p>This field is never {@code null}.</p>
+   */
   private final ELContext elContext;
 
+  /**
+   * An {@link ExpressionFactory} used for Expression Language
+   * evaluation.
+   *
+   * <p>This field is never {@code null}.</p>
+   */
   private final ExpressionFactory expressionFactory;
 
 
@@ -383,95 +449,628 @@ public class Configurations {
     this.checkState();
     return this.converters.keySet();
   }
-  
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property with the supplied {@code name}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final String getValue(final String name) {
     return this.getValue(this.getConfigurationCoordinates(), name, String.class, null);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property with the supplied {@code name}, or the supplied {@code
+   * defaultValue} if otherwise {@code null} would be returned.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param defaultValue the value to return if otherwise {@code null}
+   * would be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final String getValue(final String name, final String defaultValue) {
     return this.getValue(this.getConfigurationCoordinates(), name, String.class, defaultValue);
   }
-  
-  public final String getValue(Map<String, String> callerCoordinates, final String name) {
-    return this.getValue(callerCoordinates, name, String.class, null);
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final String getValue(final Map<String, String> configurationCoordinates, final String name) {
+    return this.getValue(configurationCoordinates, name, String.class, null);
   }
 
-  public final String getValue(Map<String, String> callerCoordinates, final String name, final String defaultValue) {
-    return this.getValue(callerCoordinates, name, String.class, defaultValue);
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, or the supplied
+   * {@code defaultValue} if otherwise {@code null} would be returned.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param defaultValue the value to return if otherwise {@code null}
+   * would be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final String getValue(final Map<String, String> configurationCoordinates, final String name, final String defaultValue) {
+    return this.getValue(configurationCoordinates, name, String.class, defaultValue);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, converted, if
+   * possible, to the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Class} representing the type to which the
+   * configuration value will be {@linkplain Converter#convert(String)
+   * converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final Class<T> type) {
     return this.getValue(this.getConfigurationCoordinates(), name, type, null);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, converted, if
+   * possible, to the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Class} representing the type to which the
+   * configuration value will be {@linkplain Converter#convert(String)
+   * converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final Class<T> type, final String defaultValue) {
     return this.getValue(this.getConfigurationCoordinates(), name, type, defaultValue);
   }
-  
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type) {
-    return this.getValue(callerCoordinates, name, (Type)type, null);
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, converted, if
+   * possible, to the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Class} representing the type to which the
+   * configuration value will be {@linkplain Converter#convert(String)
+   * converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Class<T> type) {
+    return this.getValue(configurationCoordinates, name, (Type)type, null);
   }
 
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Class<T> type, final String defaultValue) {
-    return this.getValue(callerCoordinates, name, (Type)type, defaultValue);
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, or the supplied
+   * {@code defaultValue} if {@code null} would otherwise be returned,
+   * converted, if possible, to the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Class} representing the type to which the
+   * configuration value will be {@linkplain Converter#convert(String)
+   * converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Class<T> type, final String defaultValue) {
+    return this.getValue(configurationCoordinates, name, (Type)type, defaultValue);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, converted, if
+   * possible, to the type represented by the supplied {@code
+   * typeLiteral}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param typeLiteral a {@link TypeLiteral} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final TypeLiteral<T> typeLiteral) {
     return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral, null);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, or the supplied
+   * {@code defaultValue} if {@code null} would otherwise be returned,
+   * converted, if possible, to the type represented by the supplied
+   * {@code typeLiteral}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param typeLiteral a {@link TypeLiteral} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the supplied {@code type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
     return this.getValue(this.getConfigurationCoordinates(), name, typeLiteral, defaultValue);
   }
-  
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
-    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), null);
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, converted, if
+   * possible, to the type represented by the supplied {@code
+   * typeLiteral}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param typeLiteral a {@link TypeLiteral} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * typeLiteral}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final TypeLiteral<T> typeLiteral) {
+    return this.getValue(configurationCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), null);
   }
 
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
-    return this.getValue(callerCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), defaultValue);
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, converted, if
+   * possible, to the type represented by the supplied {@code
+   * typeLiteral}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param typeLiteral a {@link TypeLiteral} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * typeLiteral}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final TypeLiteral<T> typeLiteral, final String defaultValue) {
+    return this.getValue(configurationCoordinates, name, typeLiteral == null ? (Type)null : typeLiteral.getType(), defaultValue);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, converted, if
+   * possible, to the type represented by the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Type} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final Type type) {
     return this.getValue(this.getConfigurationCoordinates(), name, type, null);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, or the supplied
+   * {@code defaultValue} if otherwise {@code null} would be returned,
+   * converted, if possible, to the type represented by the supplied
+   * {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Type} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final Type type, final String defaultValue) {
     return this.getValue(this.getConfigurationCoordinates(), name, type, defaultValue);
   }
-  
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type) {
-    return this.getValue(callerCoordinates, name, type, null);
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, converted, if
+   * possible, to the type represented by the supplied {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Type} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Type type) {
+    return this.getValue(configurationCoordinates, name, type, null);
   }
 
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Type type, final String defaultValue) {
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, or the supplied
+   * {@code defaultValue} if {@code null} would otherwise be returned,
+   * converted, if possible, to the type represented by the supplied
+   * {@code type}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param type a {@link Type} representing the type to
+   * which the configuration value will be {@linkplain
+   * Converter#convert(String) converted}; must not be {@code null}
+   *
+   * @param defaultValue the value that will be converted if {@code
+   * null} would otherwise be returned; may be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code type}
+   * is {@code null}
+   *
+   * @exception NoSuchConverterException if there is no {@link
+   * Converter} available that {@linkplain Converter#getType()
+   * handles} the {@link Type} represented by the supplied {@code
+   * type}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Type type, final String defaultValue) {
     @SuppressWarnings("unchecked")
     final Converter<T> converter = (Converter<T>)this.converters.get(type);
     if (converter == null) {
       throw new NoSuchConverterException(null, null, type);
     }
-    return this.getValue(callerCoordinates, name, converter, defaultValue);
+    return this.getValue(configurationCoordinates, name, converter, defaultValue);
   }
 
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code name}, as {@linkplain
+   * Converter#convert(String) converted} by the supplied {@link
+   * Converter}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param converter a {@link Converter} instance that will convert
+   * any {@link String} configuration value into the type of object
+   * that this method will return; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code
+   * converter} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
   public final <T> T getValue(final String name, final Converter<T> converter) {
     return this.getValue(this.getConfigurationCoordinates(), name, converter, null);
   }
-  
-  public final <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter) {
-    return this.getValue(callerCoordinates, name, converter, null);
+
+  /**
+   * Returns a configuration value corresponding to the configuration
+   * property suitable for the supplied {@code
+   * configurationCoordinates} and {@code name}, as {@linkplain
+   * Converter#convert(String) converted} by the supplied {@link
+   * Converter}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param <T> the type to which a {@link String}-typed configuration
+   * value should be converted
+   *
+   * @param configurationCoordinates a {@link Map} representing the
+   * configuration coordinates in effect for this request; may be
+   * {@code null}
+   *
+   * @param name the name of the configuration property for which a
+   * value will be returned; must not be {@code null}
+   *
+   * @param converter a {@link Converter} instance that will convert
+   * any {@link String} configuration value into the type of object
+   * that this method will return; must not be {@code null}
+   *
+   * @return the configuration value, or {@code null}
+   *
+   * @exception NullPointerException if {@code name} or {@code
+   * converter} is {@code null}
+   *
+   * @see #getValue(Map, String, Converter, String)
+   */
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Converter<T> converter) {
+    return this.getValue(configurationCoordinates, name, converter, null);
   }
 
   /**
    * Returns an object that is the value for the configuration request
-   * represented by the supplied {@code callerCoordinates}, {@code
-   * name} and {@code defaultValue} parameters, as converted by the
-   * supplied {@link Converter}.
+   * represented by the supplied {@code configurationCoordinates},
+   * {@code name} and {@code defaultValue} parameters, as converted by
+   * the supplied {@link Converter}.
    *
    * <p>This method may return {@code null}.</p>
    *
    * @param <T> the type of the object to be returned
    *
-   * @param callerCoordinates the configuration coordinates for which
+   * @param configurationCoordinates the configuration coordinates for which
    * a value should be selected; may be {@code null}
    *
    * @param name the name of the configuration property within the
@@ -504,12 +1103,12 @@ public class Configurations {
    *
    * @see #handleMalformedConfigurationValues(Collection)
    */
-  public <T> T getValue(Map<String, String> callerCoordinates, final String name, final Converter<T> converter, final String defaultValue) {
+  public <T> T getValue(Map<String, String> configurationCoordinates, final String name, final Converter<T> converter, final String defaultValue) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(converter);
     this.checkState();
-    if (callerCoordinates == null) {
-      callerCoordinates = Collections.emptyMap();
+    if (configurationCoordinates == null) {
+      configurationCoordinates = Collections.emptyMap();
     }
     T returnValue = null;
 
@@ -533,7 +1132,7 @@ public class Configurations {
           value = null;
         } else {
           this.activate(configuration);
-          value = configuration.getValue(callerCoordinates, name);
+          value = configuration.getValue(configurationCoordinates, name);
         }
       } finally {
         this.deactivate(configuration);
@@ -551,17 +1150,17 @@ public class Configurations {
           valueCoordinates = Collections.emptyMap();
         }
 
-        final int callerCoordinatesSize = callerCoordinates.size();
+        final int configurationCoordinatesSize = configurationCoordinates.size();
         final int valueCoordinatesSize = valueCoordinates.size();
 
-        if (callerCoordinatesSize < valueCoordinatesSize) {
+        if (configurationCoordinatesSize < valueCoordinatesSize) {
           // Bad value!
           if (badValues == null) {
             badValues = new LinkedList<>();
           }
           badValues.add(value);
           
-        } else if (callerCoordinates.equals(valueCoordinates)) {
+        } else if (configurationCoordinates.equals(valueCoordinates)) {
           // We have an exact match.  We hope it's going to be the
           // only one.
           
@@ -594,10 +1193,10 @@ public class Configurations {
             values.add(value);
           }
 
-        } else if (callerCoordinatesSize == valueCoordinatesSize) {
+        } else if (configurationCoordinatesSize == valueCoordinatesSize) {
           // Bad value!  The configuration subsystem handed back a
           // value containing coordinates not drawn from the
-          // callerCoordinatesSet.  We know this because we already
+          // configurationCoordinatesSet.  We know this because we already
           // tested for Set equality, which failed, so this test means
           // disparate entries.
           if (badValues == null) {
@@ -610,7 +1209,7 @@ public class Configurations {
           // break here because we're going to ensure there aren't any
           // duplicates.
           
-        } else if (callerCoordinates.entrySet().containsAll(valueCoordinates.entrySet())) {
+        } else if (configurationCoordinates.entrySet().containsAll(valueCoordinates.entrySet())) {
           // We specified, e.g., {a=b, c=d, e=f} and they have, say,
           // {c=d, e=f} or {a=b, c=d} etc. but not, say, {q=r}.
           if (values == null) {
@@ -688,7 +1287,7 @@ public class Configurations {
       }
 
       if (selectedValue == null) {
-        selectedValue = this.performArbitration(callerCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
+        selectedValue = this.performArbitration(configurationCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
       }
     }
 
@@ -775,11 +1374,12 @@ public class Configurations {
 
   /**
    * Given a logical request for a configuration value, represented by
-   * the {@code callerCoordinates} and {@code name} parameter values,
-   * and a {@link Collection} of {@link ConfigurationValue} instances
-   * that represents the ambiguous response from several {@link
-   * Configuration} instances, attempts to resolve the ambiguity by
-   * returning a single {@link ConfigurationValue} instead.
+   * the {@code configurationCoordinates} and {@code name} parameter
+   * values, and a {@link Collection} of {@link ConfigurationValue}
+   * instances that represents the ambiguous response from several
+   * {@link Configuration} instances, attempts to resolve the
+   * ambiguity by returning a single {@link ConfigurationValue}
+   * instead.
    *
    * <p>This method may return {@code null}.</p>
    *
@@ -789,7 +1389,7 @@ public class Configurations {
    * {@link Arbiter}s in turn to perform the arbitration and returns
    * the first non-{@code null} response received.</p>
    *
-   * @param callerCoordinates the ({@linkplain
+   * @param configurationCoordinates the ({@linkplain
    * Collections#unmodifiableMap(Map) immutable}) configuration
    * coordinates in effect for the request; may be {@code null}
    *
@@ -809,13 +1409,13 @@ public class Configurations {
    *
    * @see Arbiter
    */
-  protected ConfigurationValue performArbitration(final Map<? extends String, ? extends String> callerCoordinates,
+  protected ConfigurationValue performArbitration(final Map<? extends String, ? extends String> configurationCoordinates,
                                                   final String name,
                                                   final Collection<? extends ConfigurationValue> values) {
     if (this.arbiters != null && !this.arbiters.isEmpty()) {
       for (final Arbiter arbiter : arbiters) {
         if (arbiter != null) {
-          final ConfigurationValue arbitrationResult = arbiter.arbitrate(callerCoordinates, name, values);
+          final ConfigurationValue arbitrationResult = arbiter.arbitrate(configurationCoordinates, name, values);
           if (arbitrationResult != null) {
             return arbitrationResult;
           }
@@ -823,7 +1423,7 @@ public class Configurations {
       }
     }
     if (values != null && !values.isEmpty()) {
-      throw new AmbiguousConfigurationValuesException(null, null, callerCoordinates, name, values);
+      throw new AmbiguousConfigurationValuesException(null, null, configurationCoordinates, name, values);
     }
     return null;
   }

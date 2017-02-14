@@ -20,14 +20,62 @@ import java.util.Map;
 
 import org.microbean.configuration.Configurations;
 
+/**
+ * An {@link AbstractConfiguration} conceptually housing the
+ * configuration property that returns a {@link Map}-convertible
+ * {@link String} representing configuration coordinates for the
+ * calling application.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see Configurations#getConfigurationCoordinates()
+ */
 public class ConfigurationCoordinates extends AbstractConfiguration {  
+
+
+  /*
+   * Constructors.
+   */
+
   
+  /**
+   * Creates a new {@link ConfigurationCoordinates}.
+   */
   public ConfigurationCoordinates() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+  
+  /**
+   * Attempts to return a value for the {@linkplain
+   * System#getProperty(String, String) System property} named {@value
+   * org.microbean.configuration.Configurations#CONFIGURATION_COORDINATES}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param ignoredConfigurationCoordinates a {@link Map} of
+   * configuration coordinates in effect for the request; effectively
+   * ignored since by definition this method will be returning a
+   * {@link ConfigurationValue} {@linkplain
+   * ConfigurationValue#getValue() containing} a {@link String} value
+   * representing a {@link Map} of configuration coordinates for the
+   * caller; may be {@code null}; not used by this implementation
+   *
+   * @param name the name of the configuration property for which a
+   * value should be returned; may be {@code null}
+   *
+   * @return a {@link ConfigurationValue} representing the
+   * configuration coordinates to assign to the caller, or {@code
+   * null}
+   */
   @Override
-  public ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
+  public ConfigurationValue getValue(final Map<String, String> ignoredConfigurationCoordinates, final String name) {
     ConfigurationValue returnValue = null;
     if (Configurations.CONFIGURATION_COORDINATES.equals(name)) {
       final String configurationCoordinates = System.getProperty(Configurations.CONFIGURATION_COORDINATES);

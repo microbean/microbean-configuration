@@ -23,19 +23,81 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.microbean.configuration.Configurations; // for javadoc only
+
+/**
+ * A value for a configuration property as returned by a {@link
+ * Configuration} in the service of a {@link Configurations} instance.
+ *
+ * @author <a href="http://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see Configuration#getValue(Map, String)
+ */
 public class ConfigurationValue implements Serializable {
 
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
   private static final long serialVersionUID = 1L;
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link Configuration} that produced this {@link
+   * ConfigurationValue}.
+   *
+   * <p>This field may be {@code null}.</p>
+   */
   private transient Configuration configuration;
-  
+
+  /**
+   * A {@link Map} representing the specific configuration coordinates
+   * this {@link ConfigurationValue} is selected for.
+   *
+   * <p>This field may be {@code null}.</p>
+   */
   private final Map<String, String> coordinates;
 
+  /**
+   * The name of the configuration property for which this {@link
+   * ConfigurationValue} is a value.
+   *
+   * <p>This field is never {@code null}.</p>
+   */
   private final String name;
-  
+
+  /**
+   * The actual configuration value represented by this {@link
+   * ConfigurationValue}.
+   *
+   * <p>This field may be {@code null}.</p>
+   */
   private final String value;
 
+  /**
+   * Whether or not this {@link ConfigurationValue} is to be regarded
+   * as the authoritative value for the configuration property in
+   * question.
+   */
   private final boolean authoritative;
+
+
+  /*
+   * Constructors.
+   */
+
 
   public ConfigurationValue(final Configuration configuration, final Map<String, String> coordinates, final String name, final String value) {
     this(configuration, coordinates, name, value, false);
