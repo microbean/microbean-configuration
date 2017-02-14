@@ -18,6 +18,8 @@ package org.microbean.configuration.spi;
 
 import java.io.Serializable; // for javadoc only
 
+import org.microbean.configuration.api.TypeLiteral;
+
 /**
  * A {@link TypeLiteral} that can convert {@link String} values into
  * another kind of {@link Object}.

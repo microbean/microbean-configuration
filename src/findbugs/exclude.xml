@@ -8,4 +8,8 @@
     </Or>
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
   </Match>
+  <Match>
+    <Class name="org.microbean.configuration.Configurations"/>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+  </Match>
 </FindBugsFilter>

@@ -16,9 +16,13 @@
  */
 package org.microbean.configuration.spi;
 
+import java.io.Serializable;
+
 import java.util.Map;
 
 import org.microbean.configuration.Configurations;
+
+import org.microbean.configuration.api.ConfigurationValue;
 
 /**
  * An {@link AbstractConfiguration} conceptually housing the
@@ -31,8 +35,20 @@ import org.microbean.configuration.Configurations;
  *
  * @see Configurations#getConfigurationCoordinates()
  */
-public class ConfigurationCoordinates extends AbstractConfiguration {  
+public class ConfigurationCoordinates extends AbstractConfiguration implements Serializable {  
 
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
+  private static final long serialVersionUID = 1L;
+  
 
   /*
    * Constructors.

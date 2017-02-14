@@ -16,6 +16,8 @@
  */
 package org.microbean.configuration;
 
+import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,12 +28,14 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.microbean.configuration.api.AmbiguousConfigurationValuesException;
+import org.microbean.configuration.api.ConfigurationValue;
+import org.microbean.configuration.api.TypeLiteral;
+
 import org.microbean.configuration.spi.AbstractConfiguration;
 import org.microbean.configuration.spi.Configuration;
-import org.microbean.configuration.spi.ConfigurationValue;
 import org.microbean.configuration.spi.ConfigurationCoordinates;
 import org.microbean.configuration.spi.SystemPropertiesConfiguration;
-import org.microbean.configuration.spi.TypeLiteral;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -168,8 +172,10 @@ public class TestConfigurations {
    */
 
   
-  public static final class PropertiesConfiguration extends AbstractConfiguration {
+  public static final class PropertiesConfiguration extends AbstractConfiguration implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    
     private final Map<String, String> coordinates;
     
     private final Properties properties;
@@ -191,7 +197,7 @@ public class TestConfigurations {
       final Set<String> stringPropertyNames = properties.stringPropertyNames();
       assert stringPropertyNames != null;
       if (stringPropertyNames.contains(name)) {
-        return new ConfigurationValue(this, this.coordinates, name, properties.getProperty(name));
+        return new ConfigurationValue(this, this.coordinates, name, properties.getProperty(name), false);
       } else {
         return null;
       }

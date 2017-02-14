@@ -16,9 +16,13 @@
  */
 package org.microbean.configuration.spi;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.microbean.configuration.api.ConfigurationValue;
 
 /**
  * An {@link AbstractConfiguration} that houses {@linkplain
@@ -29,13 +33,19 @@ import java.util.Set;
  * @author <a href="http://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
-public class SystemPropertiesConfiguration extends AbstractConfiguration {
+public class SystemPropertiesConfiguration extends AbstractConfiguration implements Serializable {
 
 
   /*
    * Static fields.
    */
 
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * A {@link Set} of {@linkplain System#getProperties() System

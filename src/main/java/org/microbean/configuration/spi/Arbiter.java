@@ -20,7 +20,8 @@ import java.util.Collection;
 import java.util.Collections; // for javadoc only
 import java.util.Map;
 
-import org.microbean.configuration.AmbiguousConfigurationValuesException; // for javadoc only
+import org.microbean.configuration.api.AmbiguousConfigurationValuesException; // for javadoc only
+import org.microbean.configuration.api.ConfigurationValue;
 
 /**
  * A resolver of ambiguous {@link ConfigurationValue}s.

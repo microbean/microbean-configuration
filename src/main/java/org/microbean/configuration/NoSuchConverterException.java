@@ -20,6 +20,8 @@ import java.io.Serializable; // for javadoc only
 
 import java.lang.reflect.Type;
 
+import org.microbean.configuration.api.ConfigurationException;
+
 import org.microbean.configuration.spi.Converter; // for javadoc only
 
 /**

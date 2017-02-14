@@ -20,7 +20,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.microbean.configuration.ConversionException;
+import org.microbean.configuration.api.ConversionException;
 
 import org.microbean.configuration.spi.Converter;
 

@@ -22,7 +22,7 @@ import java.util.Map;
 
 import java.util.stream.Collectors;
 
-import org.microbean.configuration.ConversionException;
+import org.microbean.configuration.api.ConversionException;
 
 import org.microbean.configuration.spi.Converter;
 

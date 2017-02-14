@@ -16,9 +16,13 @@
  */
 package org.microbean.configuration.spi;
 
+import java.io.Serializable;
+
 import java.util.Map;
 
 import org.microbean.configuration.Configurations;
+
+import org.microbean.configuration.api.ConfigurationValue;
 
 /**
  * An accessor of {@link ConfigurationValue}s in configuration space.
@@ -61,14 +65,14 @@ public interface Configuration {
    * equal to the supplied {@code name}.</p>
    *
    * <p>The {@link ConfigurationValue} that is returned must be
-   * {@linkplain ConfigurationValue#ConfigurationValue(Configuration,
+   * {@linkplain ConfigurationValue#ConfigurationValue(Serializable,
    * Map, String, String, boolean) created} with this {@link
    * Configuration} as the first parameter value supplied to its
-   * {@linkplain ConfigurationValue#ConfigurationValue(Configuration,
+   * {@linkplain ConfigurationValue#ConfigurationValue(Serializable,
    * Map, String, String, boolean) constructor}.</p>
    *
    * <p>The {@link ConfigurationValue} that is returned must be
-   * {@linkplain ConfigurationValue#ConfigurationValue(Configuration,
+   * {@linkplain ConfigurationValue#ConfigurationValue(Serializable,
    * Map, String, String, boolean) created} with a {@linkplain
    * ConfigurationValue#getCoordinates() set of configuration
    * coordinates} that is a subset of the supplied {@code

@@ -19,7 +19,7 @@ package org.microbean.configuration.spi.converter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.microbean.configuration.ConversionException;
+import org.microbean.configuration.api.ConversionException;
 
 import org.microbean.configuration.spi.Converter;
 

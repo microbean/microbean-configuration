@@ -28,8 +28,5 @@
  *
  * @see org.microbean.configuration.spi.Converter
  *
- * @see org.microbean.configuration.spi.ConfigurationValue
- *
- * @see org.microbean.configuration.spi.TypeLiteral
  */
 package org.microbean.configuration.spi;
