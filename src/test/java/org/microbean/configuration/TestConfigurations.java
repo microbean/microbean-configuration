@@ -157,6 +157,11 @@ public class TestConfigurations {
     System.clearProperty("configurationCoordinates");
   }
 
+  @Test
+  public void testElExpansion() {
+    assertEquals("a " + System.getProperty("java.home") + " c", this.configurations.interpolate("a ${configurations[\"java.home\"]} c"));
+  }
+
 
   /*
    * Inner and nested classes.

@@ -16,6 +16,8 @@
  */
 package org.microbean.configuration;
 
+import java.beans.FeatureDescriptor;
+
 import java.lang.reflect.Type;
 
 import java.util.Collection;
@@ -34,6 +36,13 @@ import java.util.Set;
 import java.util.function.Function;
 
 import java.util.stream.Collectors;
+
+import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.ExpressionFactory;
+import javax.el.PropertyNotFoundException;
+import javax.el.StandardELContext;
+import javax.el.ValueExpression;
 
 import org.microbean.configuration.spi.Arbiter;
 import org.microbean.configuration.spi.Configuration;
@@ -95,6 +104,10 @@ public class Configurations {
   private final Map<Type, Converter<?>> converters;
 
   private final Map<String, String> configurationCoordinates;
+
+  private final ELContext elContext;
+
+  private final ExpressionFactory expressionFactory;
 
 
   /*
@@ -178,6 +191,13 @@ public class Configurations {
                         Collection<? extends Arbiter> arbiters) {
     super();
     this.currentlyActiveConfigurations = ThreadLocal.withInitial(() -> new HashSet<>());
+
+    this.expressionFactory = ExpressionFactory.newInstance();
+    assert this.expressionFactory != null;
+    final StandardELContext standardElContext = new StandardELContext(this.expressionFactory);
+    standardElContext.addELResolver(new ConfigurationELResolver());
+    this.elContext = standardElContext;
+    
     if (configurations == null) {
       configurations = this.loadConfigurations();
     }
@@ -671,15 +691,72 @@ public class Configurations {
         selectedValue = this.performArbitration(callerCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
       }
     }
-    
+
     if (selectedValue == null) {
-      returnValue = converter.convert(defaultValue);
+      if (defaultValue == null) {
+        returnValue = converter.convert(null);
+      } else {
+        returnValue = converter.convert(this.interpolate(defaultValue));
+      }
     } else {
-      returnValue = converter.convert(selectedValue.getValue());
+      final String valueToConvert = selectedValue.getValue();
+      if (valueToConvert == null) {
+        returnValue = converter.convert(null);
+      } else {
+        returnValue = converter.convert(this.interpolate(valueToConvert));
+      }
     }
     return returnValue;
   }
 
+  /**
+   * Interpolates any expressions occurring within the supplied {@code
+   * value} and returns the result of interpolation.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * <p>The default implementation of this method performs
+   * interpolation by using a {@link ValueExpression} as {@linkplain
+   * ExpressionFactory#createValueExpression(ELContext, String, Class)
+   * produced by an <code>ExpressionFactory</code>}.</p>
+   *
+   * <p>A {@code configurations} object is made available to any
+   * Expression Language expressions, which exposes this {@link
+   * Configurations} object.  This means, among other things, that you
+   * can retrieve configuration values using the following syntax:</p>
+   * <pre>${configurations["java.home"]}</pre>
+   *
+   * @param value a configuration value {@link String}, before any
+   * type conversion has taken place, with (possibly) expression
+   * language expressions in it; may be {@code null} in which case
+   * {@code null} is returned
+   *
+   * @return the result of interpolating the supplied {@code value},
+   * or {@code null}
+   *
+   * @exception PropertyNotFoundException if the supplied {@code
+   * value} contained a valid expression language expression that
+   * identifies an unknown property
+   *
+   * @see <a
+   * href="https://docs.oracle.com/javaee/7/tutorial/jsf-el.htm#GJDDD">the
+   * section in the Java EE Tutorial on the Unified Expression
+   * Language</a>
+   */
+  public String interpolate(final String value) {
+    final String returnValue;
+    if (value == null) {
+      returnValue = null;
+    } else {
+      final ValueExpression valueExpression = this.expressionFactory.createValueExpression(this.elContext, value, String.class);
+      assert valueExpression != null;
+      returnValue = String.class.cast(valueExpression.getValue(this.elContext));
+    }
+    return returnValue;
+  }
+  
   /**
    * Handles any badly formed {@link ConfigurationValue} instances
    * received from {@link Configuration} instances during the
@@ -843,6 +920,87 @@ public class Configurations {
    */
   private final boolean allConfigurationsInactive() {
     return this.currentlyActiveConfigurations.get().isEmpty();
+  }
+
+  private final class ConfigurationELResolver extends ELResolver {
+
+    private ConfigurationELResolver() {
+      super();
+    }
+
+    @Override
+    public final Class<?> getCommonPropertyType(final ELContext elContext, final Object base) {
+      return Object.class;
+    }
+
+    @Override
+    public final Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext elContext, final Object base) {
+      return null;
+    }
+
+    @Override
+    public final boolean isReadOnly(final ELContext elContext, final Object base, final Object property) {
+      if (elContext != null) {
+        elContext.setPropertyResolved(true);
+      }
+      return true;
+    }
+
+    @Override
+    public final Class<?> getType(final ELContext elContext, final Object base, final Object property) {
+      Class<?> returnValue = null;
+      if (base == null) {
+        if ("configurations".equals(property)) {
+          elContext.setPropertyResolved(true);
+          returnValue = Configurations.class;
+        }
+      } else if (base instanceof Configurations) {
+        if (property instanceof String) {
+          final String value = ((Configurations)base).getValue((String)property);
+          elContext.setPropertyResolved(true);
+          if (value == null) {
+            throw new PropertyNotFoundException((String)property);
+          }
+          returnValue = String.class;
+        } else {
+          throw new UnsupportedOperationException("getType(); base: " + base + "; property: " + property);
+        }
+      } else {
+        throw new UnsupportedOperationException("getType(); base: " + base + "; property: " + property);
+      }
+      return returnValue;      
+    }
+
+    @Override
+    public final Object getValue(final ELContext elContext, final Object base, final Object property) {
+      Objects.requireNonNull(elContext);
+      Object returnValue = null;
+      if (base == null) {
+        if ("configurations".equals(property)) {
+          elContext.setPropertyResolved(true);
+          returnValue = Configurations.this;
+        }
+      } else if (base instanceof Configurations) {
+        if (property instanceof String) {
+          returnValue = ((Configurations)base).getValue((String)property);
+          elContext.setPropertyResolved(true);
+          if (returnValue == null) {
+            throw new PropertyNotFoundException((String)property);
+          }          
+        }
+      } else {
+        throw new UnsupportedOperationException("getValue(); base: " + base + "; property: " + property);
+      }
+      return returnValue;
+    }
+
+    @Override
+    public final void setValue(final ELContext elContext, final Object base, final Object property, final Object value) {
+      if (elContext != null) {
+        elContext.setPropertyResolved(false);
+      }
+    }
+    
   }
   
 }

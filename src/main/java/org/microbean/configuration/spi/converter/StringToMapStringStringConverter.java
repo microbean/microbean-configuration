@@ -37,19 +37,17 @@ public final class StringToMapStringStringConverter extends Converter<Map<String
       value = value.trim();
       if (value.isEmpty()) {
         returnValue = Collections.emptyMap();
-      } else if (!value.startsWith("{") && !value.endsWith("}")) {
-        throw new ConversionException(value + " is not a Map representation");
-      } else {
+      } else if (value.startsWith("{") && value.endsWith("}")) {
         value = value.substring(1, value.length() - 1).trim(); // chops off the { and the }
-        if (value.isEmpty()) {
-          returnValue = Collections.emptyMap();
-        } else {
-          returnValue = Arrays.stream(value.split(","))
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(s -> s.split("="))
-            .collect(Collectors.toMap(a -> a[0].trim(), a -> a[1].trim()));
-        }
+      }
+      if (value.isEmpty()) {
+        returnValue = Collections.emptyMap();
+      } else {
+        returnValue = Arrays.stream(value.split(","))
+          .map(String::trim)
+          .filter(s -> !s.isEmpty())
+          .map(s -> s.split("="))
+          .collect(Collectors.toMap(a -> a[0].trim(), a -> a[1].trim()));
       }
     }
     return returnValue;

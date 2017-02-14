@@ -25,9 +25,45 @@
     <tag>HEAD</tag>
   </scm>
 
+  <dependencyManagement>
+    <dependencies>
+      
+      <dependency>
+        <groupId>javax.el</groupId>
+        <artifactId>javax.el-api</artifactId>
+        <version>3.0.1-b04</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.el</artifactId>
+        <version>3.0.1-b08</version>
+        <type>jar</type>
+      </dependency>
+      
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+
+    <!-- Provided-scoped dependencies. -->
+    
+    <dependency>
+      <groupId>javax.el</groupId>
+      <artifactId>javax.el-api</artifactId>
+      <type>jar</type>
+      <scope>provided</scope>
+    </dependency>
     
     <!-- Test-scoped dependencies. -->
+
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.el</artifactId>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
     
     <dependency>
       <groupId>junit</groupId>
@@ -66,10 +102,15 @@
   </build>
 
   <properties>
+
     <!-- findbugs-maven-plugin properties; see http://gleclaire.github.io/findbugs-maven-plugin/findbugs-mojo.html -->
     <findbugs.effort>Max</findbugs.effort>
     <findbugs.excludeFilterFile>src/findbugs/exclude.xml</findbugs.excludeFilterFile>
     <findbugs.threshold>Medium</findbugs.threshold>
+    
+    <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
+    <links>http://docs.oracle.com/javaee/7/api/</links>
+    
   </properties>
   
   <reporting>
