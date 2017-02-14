@@ -40,12 +40,21 @@ public interface Arbiter {
    *
    * <p>Implementations of this method may return {@code null}.</p>
    *
+   * <p>A special case is when the supplied {@code ambiguousValues}
+   * parameter is {@code null} or {@linkplain Collection#isEmpty()
+   * empty}.  This means, effectively, that all consulted {@link
+   * Configuration} instances returned {@code null} from their {@link
+   * Configuration#getValue(Map, String)} methods.  An {@link Arbiter}
+   * encountering this state of affairs and returning a single
+   * non-{@code null} {@link ConfigurationValue} is effectively
+   * synthesizing a default value.</p>
+   *
    * @param requestedCoordinates the ({@linkplain
    * Collections#unmodifiableMap(Map) immutable}) configuration
    * coordinates in effect for the request; may be {@code null}
    *
-   * @param name the name of the configuration value; may be {@code
-   * null}
+   * @param name the name of the configuration value; must not be
+   * {@code null}
    *
    * @param ambiguousValues an {@linkplain
    * Collections#unmodifiableCollection(Collection) immutable} {@link
@@ -53,7 +62,15 @@ public interface Arbiter {
    * ConfigurationValue}s that resulted from the request; may be
    * {@code null}
    *
-   * @return the result of arbitration, or {@code null}
+   * @return the result of arbitration, or {@code null} if the dispute
+   * cannot be arbitrated by this {@link Arbiter}
+   *
+   * @exception NullPointerException if {@code name} is {@code null}
+   *
+   * @exception AmbiguousConfigurationValuesException if overall
+   * arbitration is to be cut short by this {@link
+   * Arbiter}&mdash;normally an {@link Arbiter} should simply return
+   * {@code null}
    */
   public ConfigurationValue arbitrate(final Map<? extends String, ? extends String> requestedCoordinates,
                                       final String name,

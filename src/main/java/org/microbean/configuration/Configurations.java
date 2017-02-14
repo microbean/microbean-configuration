@@ -614,58 +614,60 @@ public class Configurations {
       this.handleMalformedConfigurationValues(badValues);
     }
     
-    if (selectedValue == null && values != null && !values.isEmpty()) {
+    if (selectedValue == null) {
       final Collection<ConfigurationValue> valuesToArbitrate = new LinkedList<>();
       int highestSpecificitySoFarEncountered = -1;
-      while (!values.isEmpty()) {
-
-        final ConfigurationValue value = values.poll();
-        assert value != null;
-
-        // The values are sorted by their specificity, most specific
-        // first.
-        final int valueSpecificity = Math.max(0, value.specificity());
-        assert highestSpecificitySoFarEncountered < 0 || valueSpecificity <= highestSpecificitySoFarEncountered;
-
-        if (highestSpecificitySoFarEncountered < 0 || valueSpecificity < highestSpecificitySoFarEncountered) {
-          if (selectedValue == null) {
-            assert valuesToArbitrate.isEmpty();
-            selectedValue = value;
-            highestSpecificitySoFarEncountered = valueSpecificity;
-          } else if (valuesToArbitrate.isEmpty()) {
-            break;
-          } else {
-            valuesToArbitrate.add(value);
-          }
-        } else if (valueSpecificity == highestSpecificitySoFarEncountered) {
-          assert selectedValue != null;
-          if (value.isAuthoritative()) {
-            if (selectedValue.isAuthoritative()) {
-              // Both say they're authoritative; arbitration required
+      if (values != null) {
+        while (!values.isEmpty()) {
+          
+          final ConfigurationValue value = values.poll();
+          assert value != null;
+          
+          // The values are sorted by their specificity, most specific
+          // first.
+          final int valueSpecificity = Math.max(0, value.specificity());
+          assert highestSpecificitySoFarEncountered < 0 || valueSpecificity <= highestSpecificitySoFarEncountered;
+          
+          if (highestSpecificitySoFarEncountered < 0 || valueSpecificity < highestSpecificitySoFarEncountered) {
+            if (selectedValue == null) {
+              assert valuesToArbitrate.isEmpty();
+              selectedValue = value;
+              highestSpecificitySoFarEncountered = valueSpecificity;
+            } else if (valuesToArbitrate.isEmpty()) {
+              break;
+            } else {
+              valuesToArbitrate.add(value);
+            }
+          } else if (valueSpecificity == highestSpecificitySoFarEncountered) {
+            assert selectedValue != null;
+            if (value.isAuthoritative()) {
+              if (selectedValue.isAuthoritative()) {
+                // Both say they're authoritative; arbitration required
+                valuesToArbitrate.add(selectedValue);
+                selectedValue = null;
+                valuesToArbitrate.add(value);
+              } else {
+                // value is authoritative; selectedValue is not; so swap
+                // them
+                selectedValue = value;
+              }
+            } else if (selectedValue.isAuthoritative()) {
+              // value is not authoritative; selected value is; so just
+              // drop value on the floor; it's not authoritative.
+            } else {
+              // Neither is authoritative; arbitration required.
               valuesToArbitrate.add(selectedValue);
               selectedValue = null;
               valuesToArbitrate.add(value);
-            } else {
-              // value is authoritative; selectedValue is not; so swap
-              // them
-              selectedValue = value;
             }
-          } else if (selectedValue.isAuthoritative()) {
-            // value is not authoritative; selected value is; so just
-            // drop value on the floor; it's not authoritative.
           } else {
-            // Neither is authoritative; arbitration required.
-            valuesToArbitrate.add(selectedValue);
-            selectedValue = null;
-            valuesToArbitrate.add(value);
+            assert false : "valueSpecificity > highestSpecificitySoFarEncountered: " + valueSpecificity + " > " + highestSpecificitySoFarEncountered;
           }
-        } else {
-          assert false : "valueSpecificity > highestSpecificitySoFarEncountered: " + valueSpecificity + " > " + highestSpecificitySoFarEncountered;
+          
         }
-        
       }
-      
-      if (!valuesToArbitrate.isEmpty()) {
+
+      if (selectedValue == null) {
         selectedValue = this.performArbitration(callerCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
       }
     }
@@ -743,7 +745,10 @@ public class Configurations {
         }
       }
     }
-    throw new AmbiguousConfigurationValuesException(null, null, callerCoordinates, name, values);
+    if (values != null && !values.isEmpty()) {
+      throw new AmbiguousConfigurationValuesException(null, null, callerCoordinates, name, values);
+    }
+    return null;
   }
 
   /**
