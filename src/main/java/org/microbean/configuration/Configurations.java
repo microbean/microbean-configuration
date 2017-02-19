@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -69,6 +70,28 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * Static fields.
    */
 
+
+  /**
+   * An {@linkplain Collections#unmodifiableMap(Map) immutable} {@link
+   * Map} of "wrapper" {@link Class} instances indexed by their
+   * {@linkplain Class#isPrimitive() primitive} counterparts.
+   *
+   * <p>This field is never {@code null}.</p>
+   */
+  private static final Map<Class<?>, Class<?>> wrapperTypes = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
+      private static final long serialVersionUID = 1L;
+      {
+        put(boolean.class, Boolean.class);
+        put(byte.class, Byte.class);
+        put(char.class, Character.class);
+        put(double.class, Double.class);
+        put(float.class, Float.class);
+        put(int.class, Integer.class);
+        put(long.class, Long.class);
+        put(short.class, Short.class);
+        put(void.class, Void.class);
+      }
+    });
   
   /**
    * The name of the configuration property whose value is a {@link
@@ -108,7 +131,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see #isActive(Configuration)
    */
   private final ThreadLocal<Set<Configuration>> currentlyActiveConfigurations;
-  
+
 
   /*
    * Instance fields.
@@ -503,7 +526,13 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see #getValue(Map, String, Converter, String)
    */
   @Override
-  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Type type, final String defaultValue) {
+  public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, Type type, final String defaultValue) {
+    if (type instanceof Class) {
+      final Class<?> c = (Class<?>)type;
+      if (c.isPrimitive()) {
+        type = wrapperTypes.get(c);
+      }
+    }
     @SuppressWarnings("unchecked")
     final Converter<T> converter = (Converter<T>)this.converters.get(type);
     if (converter == null) {

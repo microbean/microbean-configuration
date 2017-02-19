@@ -84,7 +84,7 @@ public class NoSuchConverterException extends ConfigurationException {
    * @see #getType()
    */
   public NoSuchConverterException(final Type type) {
-    super();
+    super(type == null ? null : type.toString(), null);
     this.type = type;
   }
   

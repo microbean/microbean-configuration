@@ -37,8 +37,7 @@ import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationCoordinates;
 import org.microbean.configuration.spi.SystemPropertiesConfiguration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;import static org.junit.Assert.assertNotNull;
 
 public class TestConfigurations {
 
