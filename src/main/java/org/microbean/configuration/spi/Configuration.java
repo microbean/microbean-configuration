@@ -30,7 +30,7 @@ import org.microbean.configuration.api.ConfigurationValue;
  * <p>{@link Configuration} instances are typically controlled in the
  * service of a governing {@link Configurations} object.</p>
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see #getValue(Map, String)

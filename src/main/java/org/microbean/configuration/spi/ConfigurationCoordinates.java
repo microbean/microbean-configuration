@@ -25,12 +25,12 @@ import org.microbean.configuration.Configurations;
 import org.microbean.configuration.api.ConfigurationValue;
 
 /**
- * An {@link AbstractConfiguration} conceptually housing the
+ * An {@link AbstractConfiguration} conceptually housing only the
  * configuration property that returns a {@link Map}-convertible
  * {@link String} representing configuration coordinates for the
  * calling application.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see Configurations#getConfigurationCoordinates()

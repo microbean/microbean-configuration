@@ -7,7 +7,7 @@
   </prerequisites>
 
   <artifactId>microbean-configuration</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
@@ -17,6 +17,7 @@
 
   <name>MicroBean Configuration</name>
   <description>${project.name}</description>
+  <url>http://ljnelson.github.io/${project.artifactId}</url>
 
   <scm>
     <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
@@ -45,7 +46,21 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-configuration-api</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.1-SNAPSHOT</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+        <type>jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.25</version>
         <type>jar</type>
       </dependency>
       
@@ -59,6 +74,13 @@
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-configuration-api</artifactId>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -77,6 +99,13 @@
     <dependency>
       <groupId>org.glassfish</groupId>
       <artifactId>javax.el</artifactId>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
       <type>jar</type>
       <scope>test</scope>
     </dependency>
@@ -106,15 +135,43 @@
       </resource>
       
     </resources>
+    
     <pluginManagement>
       <plugins>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
           <version>3.0.4</version>
         </plugin>
+
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.eclipse.mylyn.github</groupId>
+            <artifactId>org.eclipse.egit.github.core</artifactId>
+            <version>2.1.5</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>site-deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+    
   </build>
 
   <properties>
@@ -126,6 +183,9 @@
     
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
     <links>http://docs.oracle.com/javaee/7/api/</links>
+
+    <!-- maven-release-plugin properties -->
+    <goals>deploy,site-deploy</goals>
     
   </properties>
   

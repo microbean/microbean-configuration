@@ -58,7 +58,7 @@ import org.microbean.configuration.spi.Converter;
  * A single source for configuration values suitable for an
  * application.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see Configuration
@@ -360,6 +360,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see ServiceLoader#load(Class)
    */
   protected Collection<? extends Configuration> loadConfigurations() {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {}", this.getClass().getName(), "loadConfigurations");
+    }
     final Collection<Configuration> returnValue = new LinkedList<>();
     final ServiceLoader<Configuration> configurationLoader = ServiceLoader.load(Configuration.class);
     assert configurationLoader != null;
@@ -369,6 +372,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       final Configuration configuration = configurationIterator.next();
       assert configuration != null;
       returnValue.add(configuration);
+    }
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "loadConfigurations", returnValue);
     }
     return returnValue;
   }
@@ -390,6 +396,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see ServiceLoader#load(Class)
    */
   protected Collection<? extends Converter<?>> loadConverters() {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {}", this.getClass().getName(), "loadConverters");
+    }
     final Collection<Converter<?>> returnValue = new LinkedList<>();
     @SuppressWarnings("rawtypes")
     final ServiceLoader<Converter> converterLoader = ServiceLoader.load(Converter.class);
@@ -401,6 +410,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       final Converter<?> converter = converterIterator.next();
       assert converter != null;
       returnValue.add(converter);
+    }
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "loadConverters", returnValue);
     }
     return returnValue;
   }
@@ -422,6 +434,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see ServiceLoader#load(Class)
    */
   protected Collection<? extends Arbiter> loadArbiters() {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {}", this.getClass().getName(), "loadArbiters");
+    }
     final Collection<Arbiter> returnValue = new LinkedList<>();
     final ServiceLoader<Arbiter> arbiterLoader = ServiceLoader.load(Arbiter.class);
     assert arbiterLoader != null;
@@ -431,6 +446,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       final Arbiter arbiter = arbiterIterator.next();
       assert arbiter != null;
       returnValue.add(arbiter);
+    }
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "loadArbiters", returnValue);
     }
     return returnValue;
   }
@@ -527,6 +545,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    */
   @Override
   public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, Type type, final String defaultValue) {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {} {}, {}, {}, {}", this.getClass().getName(), "getValue", configurationCoordinates, name, type, defaultValue);
+    }
     if (type instanceof Class) {
       final Class<?> c = (Class<?>)type;
       if (c.isPrimitive()) {
@@ -538,7 +559,12 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     if (converter == null) {
       throw new NoSuchConverterException(type);
     }
-    return this.getValue(configurationCoordinates, name, converter, defaultValue);
+    logger.debug("Using {} to convert String to {}", converter, type);
+    final T returnValue = this.getValue(configurationCoordinates, name, converter, defaultValue);
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "getValue", returnValue);
+    }
+    return returnValue;
   }
 
   /**
@@ -667,6 +693,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see #handleMalformedConfigurationValues(Collection)
    */
   public <T> T getValue(Map<String, String> configurationCoordinates, final String name, final Converter<T> converter, final String defaultValue) {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {} {}, {}, {}, {}", this.getClass().getName(), "getValue", configurationCoordinates, name, converter, defaultValue);
+    }
     Objects.requireNonNull(name);
     Objects.requireNonNull(converter);
     this.checkState();
@@ -868,6 +897,10 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
         returnValue = converter.convert(this.interpolate(valueToConvert));
       }
     }
+    
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "getValue", returnValue);
+    }
     return returnValue;
   }
 
@@ -908,6 +941,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * Language</a>
    */
   public String interpolate(final String value) {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {} {}", this.getClass().getName(), "interpolate", value);
+    }
     final String returnValue;
     if (value == null) {
       returnValue = null;
@@ -915,6 +951,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       final ValueExpression valueExpression = this.expressionFactory.createValueExpression(this.elContext, value, String.class);
       assert valueExpression != null;
       returnValue = String.class.cast(valueExpression.getValue(this.elContext));
+    }
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", this.getClass().getName(), "interpolate", returnValue);
     }
     return returnValue;
   }
@@ -975,12 +1014,18 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
   protected ConfigurationValue performArbitration(final Map<? extends String, ? extends String> configurationCoordinates,
                                                   final String name,
                                                   final Collection<? extends ConfigurationValue> values) {
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("ENTRY {} {} {}, {}, {}", this.getClass().getName(), "performArbitration", configurationCoordinates, name, values);
+    }
+
+    ConfigurationValue returnValue = null;
     if (this.arbiters != null && !this.arbiters.isEmpty()) {
       for (final Arbiter arbiter : arbiters) {
         if (arbiter != null) {
           final ConfigurationValue arbitrationResult = arbiter.arbitrate(configurationCoordinates, name, values);
           if (arbitrationResult != null) {
-            return arbitrationResult;
+            returnValue = arbitrationResult;
+            break;
           }
         }
       }
@@ -988,7 +1033,11 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     if (values != null && !values.isEmpty()) {
       throw new AmbiguousConfigurationValuesException(null, null, configurationCoordinates, name, values);
     }
-    return null;
+    
+    if (this.logger.isTraceEnabled()) {
+      this.logger.trace("EXIT {} {} {}", returnValue);
+    }
+    return returnValue;
   }
 
   /**
@@ -1097,7 +1146,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * properties by treating them as the names of configuration
    * properties.
    *
-   * @author <a href="http://about.me/lairdnelson"
+   * @author <a href="https://about.me/lairdnelson"
    * target="_parent">Laird Nelson</a>
    *
    * @see ELResolver

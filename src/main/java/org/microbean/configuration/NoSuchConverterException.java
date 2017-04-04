@@ -29,8 +29,10 @@ import org.microbean.configuration.spi.Converter; // for javadoc only
  * Converter#getType() suitable} {@link Converter} could not be found
  * for a given {@link Type}.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
+ *
+ * @see Converter#getType()
  */
 public class NoSuchConverterException extends ConfigurationException {
 
@@ -57,6 +59,8 @@ public class NoSuchConverterException extends ConfigurationException {
    * suitable} {@link Converter} could not be found.
    *
    * <p>This field may be {@code null}.</p>
+   *
+   * @see Converter#getType()
    */
   private final Type type;
 
@@ -122,6 +126,8 @@ public class NoSuchConverterException extends ConfigurationException {
    * @return the {@link Type} for which a {@linkplain
    * Converter#getType() suitable} {@link Converter} could not be
    * found, or {@code null}
+   *
+   * @see Converter#getType()
    */
   public final Type getType() {
     return this.type;

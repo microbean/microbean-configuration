@@ -30,7 +30,7 @@ import org.microbean.configuration.api.ConfigurationValue;
  * minimally {@linkplain ConfigurationValue#specificity() specific}
  * {@link ConfigurationValue}s representing them.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
 public class SystemPropertiesConfiguration extends AbstractConfiguration implements Serializable {
@@ -134,7 +134,7 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
     if (name != null) {
       final String propertyValue = System.getProperty(name);
       if (propertyValue != null) {
-        returnValue = new ConfigurationValue(this, null, name, propertyValue, this.isAuthoritative(name));
+        returnValue = new ConfigurationValue(this, null /* deliberately null coordinates */, name, propertyValue, this.isAuthoritative(name));
       }
     }
     return returnValue;

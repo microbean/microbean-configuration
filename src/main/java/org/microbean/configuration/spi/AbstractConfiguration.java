@@ -21,7 +21,7 @@ import org.microbean.configuration.Configurations;
 /**
  * A skeletal implementation of the {@link Configuration} interface.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
 public abstract class AbstractConfiguration implements Configuration {

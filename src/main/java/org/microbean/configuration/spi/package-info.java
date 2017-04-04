@@ -19,7 +19,7 @@
  * Provides classes and interfaces for service providers for the
  * MicroBean Configuration framework.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see org.microbean.configuration.spi.Arbiter
@@ -27,6 +27,5 @@
  * @see org.microbean.configuration.spi.Configuration
  *
  * @see org.microbean.configuration.spi.Converter
- *
  */
 package org.microbean.configuration.spi;

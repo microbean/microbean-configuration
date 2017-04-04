@@ -27,7 +27,7 @@ import org.microbean.configuration.api.TypeLiteral;
  * @param <T> the type of {@link Object} to which {@link String}
  * values may be converted
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see #convert(String)

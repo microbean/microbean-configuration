@@ -26,7 +26,7 @@ import org.microbean.configuration.api.ConfigurationValue;
 /**
  * A resolver of ambiguous {@link ConfigurationValue}s.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see #arbitrate(Map, String, Collection)

@@ -19,7 +19,7 @@
  * Provides classes and interfaces for working with configuration
  * properties and their values.
  *
- * @author <a href="http://about.me/lairdnelson"
+ * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
  * @see org.microbean.configuration.Configurations
