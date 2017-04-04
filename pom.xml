@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>1</version>
+    <version>2</version>
   </parent>
 
   <name>MicroBean Configuration</name>
@@ -116,6 +116,13 @@
       <type>jar</type>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
     
   </dependencies>
 
@@ -128,7 +135,7 @@
       
       <resource>
         <targetPath>META-INF</targetPath>
-        <directory/>
+        <directory />
         <includes>
           <include>LICENSE</include>
         </includes>
