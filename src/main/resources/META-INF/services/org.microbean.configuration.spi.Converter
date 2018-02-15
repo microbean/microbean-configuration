@@ -1,9 +1,13 @@
 org.microbean.configuration.spi.converter.StringToBigDecimalConverter
 org.microbean.configuration.spi.converter.StringToBigIntegerConverter
 org.microbean.configuration.spi.converter.StringToBooleanConverter
+org.microbean.configuration.spi.converter.StringToCalendarConverter
 org.microbean.configuration.spi.converter.StringToCharArrayConverter
 org.microbean.configuration.spi.converter.StringToCharacterArrayConverter
+org.microbean.configuration.spi.converter.StringToDateConverter
 org.microbean.configuration.spi.converter.StringToDoubleConverter
+org.microbean.configuration.spi.converter.StringToDurationConverter
+org.microbean.configuration.spi.converter.StringToFileConverter
 org.microbean.configuration.spi.converter.StringToFloatConverter
 org.microbean.configuration.spi.converter.StringToInstantConverter
 org.microbean.configuration.spi.converter.StringToIntArrayConverter
@@ -12,6 +16,7 @@ org.microbean.configuration.spi.converter.StringToIntegerConverter
 org.microbean.configuration.spi.converter.StringToLocalDateConverter
 org.microbean.configuration.spi.converter.StringToLongConverter
 org.microbean.configuration.spi.converter.StringToMapStringStringConverter
+org.microbean.configuration.spi.converter.StringToPathConverter
 org.microbean.configuration.spi.converter.StringToShortConverter
 org.microbean.configuration.spi.converter.StringToStringCollectionConverter
 org.microbean.configuration.spi.converter.StringToStringConverter
