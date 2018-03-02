@@ -1049,7 +1049,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
         }
       }
     }
-    if (values != null && !values.isEmpty()) {
+    if (returnValue == null && values != null && !values.isEmpty()) {
       throw new AmbiguousConfigurationValuesException(null, null, configurationCoordinates, name, values);
     }
     

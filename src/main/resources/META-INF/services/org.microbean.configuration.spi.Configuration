@@ -1,2 +1,3 @@
 org.microbean.configuration.spi.ConfigurationCoordinates
 org.microbean.configuration.spi.SystemPropertiesConfiguration
+org.microbean.configuration.spi.EnvironmentVariablesConfiguration

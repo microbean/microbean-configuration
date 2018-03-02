@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,11 @@ import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.ConfigurationCoordinates;
 import org.microbean.configuration.spi.SystemPropertiesConfiguration;
 
-import static org.junit.Assert.assertEquals;import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import static org.junit.Assume.assumeNotNull;
 
 public class TestConfigurations {
 
@@ -163,6 +167,17 @@ public class TestConfigurations {
   @Test
   public void testElExpansion() {
     assertEquals("a " + System.getProperty("java.home") + " c", this.configurations.interpolate("a ${configurations[\"java.home\"]} c"));
+  }
+
+  @Test
+  public void testArbitration() {
+    assumeNotNull(System.getenv("PATH"));
+    String value = new Configurations().getValue("PATH");
+    assertEquals(System.getenv("PATH"), value);
+    assertNull(System.getProperty("PATH"));
+    System.setProperty("PATH", "me first");
+    value = new Configurations().getValue("PATH");
+    assertEquals("me first", value);
   }
 
 
