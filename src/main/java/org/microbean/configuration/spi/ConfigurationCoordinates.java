@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package org.microbean.configuration.spi;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.microbean.configuration.Configurations;
 
@@ -35,7 +37,7 @@ import org.microbean.configuration.api.ConfigurationValue;
  *
  * @see Configurations#getConfigurationCoordinates()
  */
-public class ConfigurationCoordinates extends AbstractConfiguration implements Serializable {  
+public final class ConfigurationCoordinates extends AbstractConfiguration implements Serializable {  
 
 
   /*
@@ -91,7 +93,7 @@ public class ConfigurationCoordinates extends AbstractConfiguration implements S
    * null}
    */
   @Override
-  public ConfigurationValue getValue(final Map<String, String> ignoredConfigurationCoordinates, final String name) {
+  public final ConfigurationValue getValue(final Map<String, String> ignoredConfigurationCoordinates, final String name) {
     ConfigurationValue returnValue = null;
     if (Configurations.CONFIGURATION_COORDINATES.equals(name)) {
       final String configurationCoordinates = System.getProperty(Configurations.CONFIGURATION_COORDINATES);
@@ -100,6 +102,22 @@ public class ConfigurationCoordinates extends AbstractConfiguration implements S
       }
     }
     return returnValue;
+  }
+
+  /**
+   * Returns a {@link Set} of the names of all {@link
+   * ConfigurationValue}s that might be returned by this {@link
+   * Configuration}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>This implementation returns a {@link Set} with only the value
+   * of {@link Configurations#CONFIGURATION_COORDINATES} in it.</p>
+   *
+   * @return a non-{@code null} {@link Set} of names
+   */
+  public final Set<String> getNames() {
+    return Collections.singleton(Configurations.CONFIGURATION_COORDINATES);
   }
   
 }

@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.TreeSet;
 
 import java.util.function.Function;
 
@@ -971,6 +972,45 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     }
     if (this.logger.isLoggable(Level.FINER)) {
       this.logger.exiting(cn, mn, returnValue);
+    }
+    return returnValue;
+  }
+
+  /**
+   * Returns a {@link Set} of names of {@link ConfigurationValue}s
+   * that might be returned by this {@link Configurations} instance.
+   *
+   * <p>This method does not return {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>Just because a name appears in the returned {@link Set} does
+   * <em>not</em> mean that a {@link ConfigurationValue} <em>will</em>
+   * be returned for it in a location in configuration space
+   * identified by any arbitrary set of configuration coordinates.</p>
+   *
+   * @return a non-{@code null} {@link Set} of names of {@link
+   * ConfigurationValue}s
+   */
+  public Set<String> getNames() {
+    final Set<String> returnValue;
+    if (this.configurations == null || this.configurations.isEmpty()) {
+      returnValue = Collections.emptySet();
+    } else {
+      final Set<String> names = new TreeSet<>();
+      for (final Configuration configuration : this.configurations) {
+        if (configuration != null) {
+          final Set<String> configurationNames = configuration.getNames();
+          if (configurationNames != null && !configurationNames.isEmpty()) {
+            names.addAll(configurationNames);
+          }
+        }
+      }
+      if (names.isEmpty()) {
+        returnValue = Collections.emptySet();
+      } else {
+        returnValue = Collections.unmodifiableSet(names);
+      }
     }
     return returnValue;
   }

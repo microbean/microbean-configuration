@@ -216,6 +216,13 @@ public class TestConfigurations {
         return null;
       }
     }
+
+    @Override
+    public Set<String> getNames() {
+      final Properties properties = this.getProperties();
+      assert properties != null;
+      return Collections.unmodifiableSet(properties.stringPropertyNames());
+    }
     
   }
 

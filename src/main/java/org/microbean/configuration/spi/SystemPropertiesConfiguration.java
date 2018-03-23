@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.microbean.configuration.spi;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.microbean.configuration.api.ConfigurationValue;
@@ -140,6 +142,30 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
     return returnValue;
   }
 
+  /**
+   * Returns a {@link Set} of the names of all {@link
+   * ConfigurationValue}s that might be returned by this {@link
+   * Configuration}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>This implementation returns an immutable representation of the
+   * equivalent of {@link System#getProperties()
+   * System.getProperties().stringPropertyNames()}.</p>
+   *
+   * @return a non-{@code null} {@link Set} of names
+   */
+  @Override
+  public Set<String> getNames() {
+    final Properties properties = System.getProperties();
+    assert properties != null; // by contract
+    assert !properties.isEmpty(); // by contract
+    final Set<String> returnValue = Collections.unmodifiableSet(properties.stringPropertyNames());
+    return returnValue;
+  }
+  
   /**
    * Returns {@code true} if the supplied {@code name} is not {@code
    * null} and is one of the {@linkplain System#getProperties() System

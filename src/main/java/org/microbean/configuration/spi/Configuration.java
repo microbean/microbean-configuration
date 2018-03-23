@@ -19,6 +19,7 @@ package org.microbean.configuration.spi;
 import java.io.Serializable;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.microbean.configuration.Configurations;
 
@@ -96,5 +97,22 @@ public interface Configuration {
    * @see ConfigurationValue
    */
   public ConfigurationValue getValue(final Map<String, String> configurationCoordinates, final String name);
+
+  /**
+   * Returns a {@link Set} of the names of all {@link
+   * ConfigurationValue}s that might be returned by this {@link
+   * Configuration}.
+   *
+   * <p>Implementations of this method must not return {@code
+   * null}.</p>
+   *
+   * <p>Just because a name appears in the returned {@link Set} does
+   * <em>not</em> mean that a {@link ConfigurationValue} will be
+   * returned for it in a location in configuration space identified
+   * by any arbitrary set of configuration coordinates.</p>
+   *
+   * @return a non-{@code null} {@link Set} of names
+   */
+  public Set<String> getNames();
   
 }

@@ -18,7 +18,9 @@ package org.microbean.configuration.spi;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.microbean.configuration.api.ConfigurationValue;
 
@@ -86,6 +88,24 @@ public class EnvironmentVariablesConfiguration extends AbstractConfiguration imp
         returnValue = new ConfigurationValue(this, null /* deliberately null coordinates */, name, propertyValue, false);
       }
     }
+    return returnValue;
+  }
+
+  /**
+   * Returns a {@link Set} of the names of all {@link
+   * ConfigurationValue}s that might be returned by this {@link
+   * Configuration}.
+   *
+   * <p>This implementation does not return {@code null}.</p>
+   *
+   * <p>This implementation returns the equivalent of {@link
+   * System#getenv() System.getenv().keySet()}.</p>
+   *
+   * @return a non-{@code null} {@link Set} of names
+   */
+  @Override
+  public Set<String> getNames() {
+    final Set<String> returnValue = System.getenv().keySet();
     return returnValue;
   }
 

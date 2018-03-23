@@ -16,6 +16,8 @@
  */
 package org.microbean.configuration.spi;
 
+import java.util.Set;
+
 import org.microbean.configuration.Configurations;
 
 /**
@@ -90,5 +92,5 @@ public abstract class AbstractConfiguration implements Configuration {
   public Configurations getConfigurations() {
     return this.configurations;
   }
-  
+
 }
