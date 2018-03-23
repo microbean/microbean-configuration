@@ -992,6 +992,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @return a non-{@code null} {@link Set} of names of {@link
    * ConfigurationValue}s
    */
+  @Override
   public Set<String> getNames() {
     final Set<String> returnValue;
     if (this.configurations == null || this.configurations.isEmpty()) {

@@ -16,6 +16,8 @@
  */
 package org.microbean.configuration.spi;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +39,19 @@ import java.util.Objects;
  *
  * @see #compare(Object, Object)
  */
-public class RankedComparator<T> implements Comparator<T> {
+public class RankedComparator<T> implements Comparator<T>, Serializable {
+
+
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization purposes}.
+   */
+  private static final long serialVersionUID = 1L;
 
 
   /*

@@ -56,6 +56,7 @@ public class ConfigurationValueSourceComparingArbiter extends ComparatorBasedArb
    */
   public ConfigurationValueSourceComparingArbiter(final List<? extends Class<? extends Configuration>> configurationTypes) {
     super(new RankedComparator<ConfigurationValue>(configurationTypes) {
+        private static final long serialVersionUID = 1L;
         @Override
         protected final Object getComparisonObject(final ConfigurationValue realObject) {
           Object returnValue = null;
