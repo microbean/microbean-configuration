@@ -42,7 +42,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-configuration-api</artifactId>
-        <version>0.4.1</version>
+        <version>0.4.2</version>
         <type>jar</type>
       </dependency>
 
@@ -149,8 +149,9 @@
     <findbugs.threshold>Medium</findbugs.threshold>
     
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <doctitle>&lt;a href="${project.url}" target="_parent"&gt;${project.artifactId}&lt;/a&gt; ${project.version} &lt;a href="https://travis-ci.org/microbean/${project.artifactId}" target="_parent"&gt;&lt;img src="https://travis-ci.org/microbean/${project.artifactId}.svg?branch=master"&gt;&lt;/a&gt;</doctitle>
+    <doctitle>&lt;a href="${project.url}" target="_parent"&gt;&lt;span style="font-family:Lobster, cursive;"&gt;µb&lt;/span&gt; ${project.artifactId}&lt;/a&gt; ${project.version} &lt;a href="https://travis-ci.org/microbean/${project.artifactId}" target="_parent"&gt;&lt;img src="https://travis-ci.org/microbean/${project.artifactId}.svg?branch=master"&gt;&lt;/a&gt;</doctitle>
     <links>http://docs.oracle.com/javaee/7/api/,https://microbean.github.io/microbean-configuration-api/apidocs/</links>
+    <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
     <!-- maven-release-plugin properties -->
     <goals>deploy,site-deploy</goals>

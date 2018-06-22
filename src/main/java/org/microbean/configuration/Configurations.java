@@ -74,7 +74,46 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * Static fields.
    */
 
+  
+  /**
+   * A {@link ServiceLoader} instance used by the {@link
+   * #loadConfigurations()} method.
+   *
+   * <p>This field may be {@code null}.</p>
+   *
+   * @see #loadConfigurations()
+   *
+   * @see ServiceLoader
+   */
+  private static volatile ServiceLoader<Configuration> configurationLoader;
 
+  /**
+   * A {@link ServiceLoader} instance used by the {@link
+   * #loadConverters()} method.
+   *
+   * <p>This field may be {@code null}.</p>
+   *
+   * @see #loadConverters()
+   *
+   * @see ServiceLoader
+   */
+  @SuppressWarnings("rawtypes")
+  private static volatile ServiceLoader<Converter> converterLoader;
+
+  /**
+   * A {@link ServiceLoader} instance used by the {@link
+   * #loadArbiters()} method.
+   *
+   * <p>This field may be {@code null}.</p>
+   *
+   * @see #loadArbiters()
+   *
+   * @see ServiceLoader
+   */
+  @SuppressWarnings("rawtypes")
+  private static volatile ServiceLoader<Arbiter> arbiterLoader;
+
+  
   /**
    * An {@linkplain Collections#unmodifiableMap(Map) immutable} {@link
    * Map} of "wrapper" {@link Class} instances indexed by their
@@ -370,8 +409,12 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       this.logger.entering(cn, mn);
     }
     final Collection<Configuration> returnValue = new LinkedList<>();
-    final ServiceLoader<Configuration> configurationLoader = ServiceLoader.load(Configuration.class);
-    assert configurationLoader != null;
+    ServiceLoader<Configuration> configurationLoader = Configurations.configurationLoader;
+    if (configurationLoader == null) {
+      configurationLoader = ServiceLoader.load(Configuration.class);
+      assert configurationLoader != null;
+      Configurations.configurationLoader = configurationLoader;
+    }
     final Iterator<Configuration> configurationIterator = configurationLoader.iterator();
     assert configurationIterator != null;
     while (configurationIterator.hasNext()) {
@@ -409,8 +452,12 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     }
     final Collection<Converter<?>> returnValue = new LinkedList<>();
     @SuppressWarnings("rawtypes")
-    final ServiceLoader<Converter> converterLoader = ServiceLoader.load(Converter.class);
-    assert converterLoader != null;
+    ServiceLoader<Converter> converterLoader = Configurations.converterLoader;
+    if (converterLoader == null) {
+      converterLoader = ServiceLoader.load(Converter.class);
+      assert converterLoader != null;
+      Configurations.converterLoader = converterLoader;
+    }
     @SuppressWarnings("rawtypes")
     final Iterator<Converter> converterIterator = converterLoader.iterator();
     assert converterIterator != null;
@@ -448,8 +495,12 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       this.logger.entering(cn, mn);
     }
     final Collection<Arbiter> returnValue = new LinkedList<>();
-    final ServiceLoader<Arbiter> arbiterLoader = ServiceLoader.load(Arbiter.class);
-    assert arbiterLoader != null;
+    ServiceLoader<Arbiter> arbiterLoader = Configurations.arbiterLoader;
+    if (arbiterLoader == null) {
+      arbiterLoader = ServiceLoader.load(Arbiter.class);
+      assert arbiterLoader != null;
+      Configurations.arbiterLoader = arbiterLoader;
+    }
     final Iterator<Arbiter> arbiterIterator = arbiterLoader.iterator();
     assert arbiterIterator != null;
     while (arbiterIterator.hasNext()) {

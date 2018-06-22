@@ -51,7 +51,7 @@ public interface Configuration {
    *
    * @exception NullPointerException if {@code configurations} is
    * {@code null}
-   */
+o   */
   public void setConfigurations(final Configurations configurations);
 
   /**
