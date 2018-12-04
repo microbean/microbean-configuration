@@ -1035,6 +1035,8 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    *
    * <p>Overrides of this method must not return {@code null}.</p>
    *
+   * <p>This implementation does not cache results.</p>
+   *
    * <p>Just because a name appears in the returned {@link Set} does
    * <em>not</em> mean that a {@link ConfigurationValue} <em>will</em>
    * be returned for it in a location in configuration space
@@ -1045,6 +1047,11 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    */
   @Override
   public Set<String> getNames() {
+    final String cn = this.getClass().getName();
+    final String mn = "getNames";
+    if (this.logger.isLoggable(Level.FINER)) {
+      this.logger.entering(cn, mn);
+    }
     final Set<String> returnValue;
     if (this.configurations == null || this.configurations.isEmpty()) {
       returnValue = Collections.emptySet();
@@ -1063,6 +1070,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       } else {
         returnValue = Collections.unmodifiableSet(names);
       }
+    }
+    if (this.logger.isLoggable(Level.FINER)) {
+      this.logger.exiting(cn, mn, returnValue);
     }
     return returnValue;
   }
@@ -1469,9 +1479,11 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     }
 
     /**
-     * Effectively does nothing when invoked.
+     * Effectively does nothing when invoked by {@linkplain
+     * ELContext#setPropertyResolved(boolean) marking the property as
+     * resolved}.
      *
-     * @param elContext the {@link ELContext} in effect; ignored; may be {@code null}
+     * @param elContext the {@link ELContext} in effect; may be {@code null}
      *
      * @param base the base; ignored; may be {@code null}
      *
