@@ -8,7 +8,7 @@
 <div class="sourceContainer">
 <pre><span class="sourceLineNo">001</span>/* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-<a name="line.1"></a>
 <span class="sourceLineNo">002</span> *<a name="line.2"></a>
-<span class="sourceLineNo">003</span> * Copyright © 2017-2018 microBean.<a name="line.3"></a>
+<span class="sourceLineNo">003</span> * Copyright © 2017–2019 microBean.<a name="line.3"></a>
 <span class="sourceLineNo">004</span> *<a name="line.4"></a>
 <span class="sourceLineNo">005</span> * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.5"></a>
 <span class="sourceLineNo">006</span> * you may not use this file except in compliance with the License.<a name="line.6"></a>
@@ -51,141 +51,149 @@
 <span class="sourceLineNo">043</span>   * Constructors.<a name="line.43"></a>
 <span class="sourceLineNo">044</span>   */<a name="line.44"></a>
 <span class="sourceLineNo">045</span><a name="line.45"></a>
-<span class="sourceLineNo">046</span>  <a name="line.46"></a>
+<span class="sourceLineNo">046</span><a name="line.46"></a>
 <span class="sourceLineNo">047</span>  /**<a name="line.47"></a>
 <span class="sourceLineNo">048</span>   * Creates a new {@link ConfigurationValueSourceComparingArbiter}.<a name="line.48"></a>
 <span class="sourceLineNo">049</span>   *<a name="line.49"></a>
-<span class="sourceLineNo">050</span>   * @param configurationTypes a {@link List} of {@link Class}<a name="line.50"></a>
-<span class="sourceLineNo">051</span>   * instances describing configuration value {@linkplain<a name="line.51"></a>
-<span class="sourceLineNo">052</span>   * ConfigurationValue#getSource() sources}; may be (trivially)<a name="line.52"></a>
-<span class="sourceLineNo">053</span>   * {@code null}<a name="line.53"></a>
-<span class="sourceLineNo">054</span>   *<a name="line.54"></a>
-<span class="sourceLineNo">055</span>   * @see RankedComparator#RankedComparator(List)<a name="line.55"></a>
-<span class="sourceLineNo">056</span>   */<a name="line.56"></a>
-<span class="sourceLineNo">057</span>  public ConfigurationValueSourceComparingArbiter(final List&lt;? extends Class&lt;? extends Configuration&gt;&gt; configurationTypes) {<a name="line.57"></a>
-<span class="sourceLineNo">058</span>    super(new RankedComparator&lt;ConfigurationValue&gt;(configurationTypes) {<a name="line.58"></a>
-<span class="sourceLineNo">059</span>        private static final long serialVersionUID = 1L;<a name="line.59"></a>
-<span class="sourceLineNo">060</span>        @Override<a name="line.60"></a>
-<span class="sourceLineNo">061</span>        protected final Object getComparisonObject(final ConfigurationValue realObject) {<a name="line.61"></a>
-<span class="sourceLineNo">062</span>          Object returnValue = null;<a name="line.62"></a>
-<span class="sourceLineNo">063</span>          if (realObject != null) {<a name="line.63"></a>
-<span class="sourceLineNo">064</span>            final Object source = realObject.getSource();<a name="line.64"></a>
-<span class="sourceLineNo">065</span>            if (source != null) {<a name="line.65"></a>
-<span class="sourceLineNo">066</span>              returnValue = source.getClass();<a name="line.66"></a>
-<span class="sourceLineNo">067</span>            }<a name="line.67"></a>
-<span class="sourceLineNo">068</span>          }<a name="line.68"></a>
-<span class="sourceLineNo">069</span>          return returnValue;<a name="line.69"></a>
-<span class="sourceLineNo">070</span>        }<a name="line.70"></a>
-<span class="sourceLineNo">071</span>      });<a name="line.71"></a>
-<span class="sourceLineNo">072</span>  }<a name="line.72"></a>
-<span class="sourceLineNo">073</span><a name="line.73"></a>
-<span class="sourceLineNo">074</span><a name="line.74"></a>
-<span class="sourceLineNo">075</span>  /*<a name="line.75"></a>
-<span class="sourceLineNo">076</span>   * Instance methods.<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   */<a name="line.77"></a>
-<span class="sourceLineNo">078</span><a name="line.78"></a>
-<span class="sourceLineNo">079</span><a name="line.79"></a>
-<span class="sourceLineNo">080</span>  /**<a name="line.80"></a>
-<span class="sourceLineNo">081</span>   * Resolves the configuration value ambiguity represented by the<a name="line.81"></a>
-<span class="sourceLineNo">082</span>   * supplied {@code ambiguousValues} parameter value by selecting the<a name="line.82"></a>
-<span class="sourceLineNo">083</span>   * {@link ConfigurationValue} whose {@linkplain<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   * ConfigurationValue#getSource() associated source} is {@linkplain<a name="line.84"></a>
-<span class="sourceLineNo">085</span>   * #ConfigurationValueSourceComparingArbiter(List) ranked} closer to<a name="line.85"></a>
-<span class="sourceLineNo">086</span>   * {@code 0}.<a name="line.86"></a>
-<span class="sourceLineNo">087</span>   *<a name="line.87"></a>
-<span class="sourceLineNo">088</span>   * @param requestedCoordinates the ({@linkplain<a name="line.88"></a>
-<span class="sourceLineNo">089</span>   * Collections#unmodifiableMap(Map) immutable}) configuration<a name="line.89"></a>
-<span class="sourceLineNo">090</span>   * coordinates in effect for the request; may be {@code null}<a name="line.90"></a>
-<span class="sourceLineNo">091</span>   *<a name="line.91"></a>
-<span class="sourceLineNo">092</span>   * @param name the name of the configuration value; must not be<a name="line.92"></a>
-<span class="sourceLineNo">093</span>   * {@code null}<a name="line.93"></a>
-<span class="sourceLineNo">094</span>   *<a name="line.94"></a>
-<span class="sourceLineNo">095</span>   * @param ambiguousValues an {@linkplain<a name="line.95"></a>
-<span class="sourceLineNo">096</span>   * Collections#unmodifiableCollection(Collection) immutable} {@link<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   * Collection} of definitionally ambiguous {@link<a name="line.97"></a>
-<span class="sourceLineNo">098</span>   * ConfigurationValue}s that resulted from the request; may be<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   * {@code null}<a name="line.99"></a>
-<span class="sourceLineNo">100</span>   *<a name="line.100"></a>
-<span class="sourceLineNo">101</span>   * @return the result of arbitration, or {@code null} if the dispute<a name="line.101"></a>
-<span class="sourceLineNo">102</span>   * cannot be arbitrated by this {@link Arbiter}<a name="line.102"></a>
-<span class="sourceLineNo">103</span>   *<a name="line.103"></a>
-<span class="sourceLineNo">104</span>   * @exception NullPointerException if {@code name} is {@code null}<a name="line.104"></a>
-<span class="sourceLineNo">105</span>   */<a name="line.105"></a>
-<span class="sourceLineNo">106</span>  @Override<a name="line.106"></a>
-<span class="sourceLineNo">107</span>  public ConfigurationValue arbitrate(final Map&lt;? extends String, ? extends String&gt; requestedCoordinates,<a name="line.107"></a>
-<span class="sourceLineNo">108</span>                                      final String name,<a name="line.108"></a>
-<span class="sourceLineNo">109</span>                                      final Collection&lt;? extends ConfigurationValue&gt; ambiguousValues) {<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    final ConfigurationValue returnValue;<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    if (ambiguousValues == null || ambiguousValues.isEmpty() || !this.canArbitrate(ambiguousValues)) {<a name="line.111"></a>
-<span class="sourceLineNo">112</span>      returnValue = null;<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    } else {<a name="line.113"></a>
-<span class="sourceLineNo">114</span>      final int size = ambiguousValues.size();<a name="line.114"></a>
-<span class="sourceLineNo">115</span>      assert size &gt; 0;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>      switch (size) {<a name="line.116"></a>
-<span class="sourceLineNo">117</span>      case 1: // pathological case<a name="line.117"></a>
-<span class="sourceLineNo">118</span>        returnValue = ambiguousValues.iterator().next();<a name="line.118"></a>
-<span class="sourceLineNo">119</span>        break;<a name="line.119"></a>
-<span class="sourceLineNo">120</span>      default:<a name="line.120"></a>
-<span class="sourceLineNo">121</span>        final List&lt;? extends ConfigurationValue&gt; list = new ArrayList&lt;&gt;(ambiguousValues);<a name="line.121"></a>
-<span class="sourceLineNo">122</span>        list.sort(this.getComparator());<a name="line.122"></a>
-<span class="sourceLineNo">123</span>        returnValue = list.get(0);<a name="line.123"></a>
-<span class="sourceLineNo">124</span>        break;<a name="line.124"></a>
-<span class="sourceLineNo">125</span>      }<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    }<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    return returnValue;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>  }<a name="line.128"></a>
-<span class="sourceLineNo">129</span><a name="line.129"></a>
-<span class="sourceLineNo">130</span>  /**<a name="line.130"></a>
-<span class="sourceLineNo">131</span>   * Returns the {@link RankedComparator} used by this {@link<a name="line.131"></a>
-<span class="sourceLineNo">132</span>   * ConfigurationValueSourceComparingArbiter} implementation.<a name="line.132"></a>
-<span class="sourceLineNo">133</span>   *<a name="line.133"></a>
-<span class="sourceLineNo">134</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.134"></a>
-<span class="sourceLineNo">135</span>   *<a name="line.135"></a>
-<span class="sourceLineNo">136</span>   * &lt;p&gt;Overrides of this method must never return {@code null}.&lt;/p&gt;<a name="line.136"></a>
-<span class="sourceLineNo">137</span>   *<a name="line.137"></a>
-<span class="sourceLineNo">138</span>   * @return a non-{@code null} {@link RankedComparator}<a name="line.138"></a>
-<span class="sourceLineNo">139</span>   */<a name="line.139"></a>
-<span class="sourceLineNo">140</span>  @Override<a name="line.140"></a>
-<span class="sourceLineNo">141</span>  protected RankedComparator&lt;ConfigurationValue&gt; getComparator() {<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    return (RankedComparator&lt;ConfigurationValue&gt;)super.getComparator();<a name="line.142"></a>
-<span class="sourceLineNo">143</span>  }<a name="line.143"></a>
-<span class="sourceLineNo">144</span><a name="line.144"></a>
-<span class="sourceLineNo">145</span>  /**<a name="line.145"></a>
-<span class="sourceLineNo">146</span>   * Returns {@code true} if this {@link<a name="line.146"></a>
-<span class="sourceLineNo">147</span>   * ConfigurationValueSourceComparingArbiter} can effectively<a name="line.147"></a>
-<span class="sourceLineNo">148</span>   * arbitrate the conflict represented by the supplied {@link<a name="line.148"></a>
-<span class="sourceLineNo">149</span>   * Collection} of ambiguous {@link ConfigurationValue}s.<a name="line.149"></a>
-<span class="sourceLineNo">150</span>   *<a name="line.150"></a>
-<span class="sourceLineNo">151</span>   * @param ambiguousValues a {@link Collection} of {@link<a name="line.151"></a>
-<span class="sourceLineNo">152</span>   * ConfigurationValue}s; may be {@code null}; must not be modified<a name="line.152"></a>
-<span class="sourceLineNo">153</span>   * by overrides of this method<a name="line.153"></a>
-<span class="sourceLineNo">154</span>   *<a name="line.154"></a>
-<span class="sourceLineNo">155</span>   * @return {@code true} if this {@link<a name="line.155"></a>
-<span class="sourceLineNo">156</span>   * ConfigurationValueSourceComparingArbiter} can effectively<a name="line.156"></a>
-<span class="sourceLineNo">157</span>   * arbitrate the conflict represented by the supplied {@link<a name="line.157"></a>
-<span class="sourceLineNo">158</span>   * Collection} of ambiguous {@link ConfigurationValue}s; {@code<a name="line.158"></a>
-<span class="sourceLineNo">159</span>   * false} otherwise<a name="line.159"></a>
-<span class="sourceLineNo">160</span>   */<a name="line.160"></a>
-<span class="sourceLineNo">161</span>  protected boolean canArbitrate(final Collection&lt;? extends ConfigurationValue&gt; ambiguousValues) {<a name="line.161"></a>
-<span class="sourceLineNo">162</span>    final boolean returnValue;<a name="line.162"></a>
-<span class="sourceLineNo">163</span>    if (ambiguousValues == null || ambiguousValues.isEmpty()) {<a name="line.163"></a>
-<span class="sourceLineNo">164</span>      returnValue = false;<a name="line.164"></a>
-<span class="sourceLineNo">165</span>    } else {<a name="line.165"></a>
-<span class="sourceLineNo">166</span>      boolean canArbitrate = true;<a name="line.166"></a>
-<span class="sourceLineNo">167</span>      final RankedComparator&lt;ConfigurationValue&gt; comparator = this.getComparator();<a name="line.167"></a>
-<span class="sourceLineNo">168</span>      assert comparator != null;<a name="line.168"></a>
-<span class="sourceLineNo">169</span>      for (final ConfigurationValue value : ambiguousValues) {<a name="line.169"></a>
-<span class="sourceLineNo">170</span>        if (value == null || !comparator.ranks(value)) {<a name="line.170"></a>
-<span class="sourceLineNo">171</span>          canArbitrate = false;<a name="line.171"></a>
-<span class="sourceLineNo">172</span>          break;<a name="line.172"></a>
-<span class="sourceLineNo">173</span>        }<a name="line.173"></a>
-<span class="sourceLineNo">174</span>      }<a name="line.174"></a>
-<span class="sourceLineNo">175</span>      returnValue = canArbitrate;<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    }<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    return returnValue;<a name="line.177"></a>
-<span class="sourceLineNo">178</span>  }<a name="line.178"></a>
-<span class="sourceLineNo">179</span><a name="line.179"></a>
-<span class="sourceLineNo">180</span>}<a name="line.180"></a>
+<span class="sourceLineNo">050</span>   * @see #ConfigurationValueSourceComparingArbiter(List)<a name="line.50"></a>
+<span class="sourceLineNo">051</span>   */<a name="line.51"></a>
+<span class="sourceLineNo">052</span>  public ConfigurationValueSourceComparingArbiter() {<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    this(null);<a name="line.53"></a>
+<span class="sourceLineNo">054</span>  }<a name="line.54"></a>
+<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">056</span>  /**<a name="line.56"></a>
+<span class="sourceLineNo">057</span>   * Creates a new {@link ConfigurationValueSourceComparingArbiter}.<a name="line.57"></a>
+<span class="sourceLineNo">058</span>   *<a name="line.58"></a>
+<span class="sourceLineNo">059</span>   * @param configurationInstances a {@link List} of {@link Class}<a name="line.59"></a>
+<span class="sourceLineNo">060</span>   * instances describing configuration value {@linkplain<a name="line.60"></a>
+<span class="sourceLineNo">061</span>   * ConfigurationValue#getSource() sources}; may be (trivially)<a name="line.61"></a>
+<span class="sourceLineNo">062</span>   * {@code null}<a name="line.62"></a>
+<span class="sourceLineNo">063</span>   *<a name="line.63"></a>
+<span class="sourceLineNo">064</span>   * @see RankedComparator#RankedComparator(List)<a name="line.64"></a>
+<span class="sourceLineNo">065</span>   */<a name="line.65"></a>
+<span class="sourceLineNo">066</span>  public ConfigurationValueSourceComparingArbiter(final List&lt;? extends Configuration&gt; configurationInstances) {<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    super(new RankedComparator&lt;ConfigurationValue&gt;(configurationInstances) {<a name="line.67"></a>
+<span class="sourceLineNo">068</span>        private static final long serialVersionUID = 1L;<a name="line.68"></a>
+<span class="sourceLineNo">069</span>        @Override<a name="line.69"></a>
+<span class="sourceLineNo">070</span>        protected final Object getComparisonObject(final ConfigurationValue realObject) {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>          final Object returnValue;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>          if (realObject == null) {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>            returnValue = null;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>          } else {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            returnValue = realObject.getSource();<a name="line.75"></a>
+<span class="sourceLineNo">076</span>          }<a name="line.76"></a>
+<span class="sourceLineNo">077</span>          return returnValue;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>        }<a name="line.78"></a>
+<span class="sourceLineNo">079</span>      });<a name="line.79"></a>
+<span class="sourceLineNo">080</span>  }<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span><a name="line.82"></a>
+<span class="sourceLineNo">083</span>  /*<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   * Instance methods.<a name="line.84"></a>
+<span class="sourceLineNo">085</span>   */<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span><a name="line.87"></a>
+<span class="sourceLineNo">088</span>  /**<a name="line.88"></a>
+<span class="sourceLineNo">089</span>   * Resolves the configuration value ambiguity represented by the<a name="line.89"></a>
+<span class="sourceLineNo">090</span>   * supplied {@code ambiguousValues} parameter value by selecting the<a name="line.90"></a>
+<span class="sourceLineNo">091</span>   * {@link ConfigurationValue} whose {@linkplain<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   * ConfigurationValue#getSource() associated source} is {@linkplain<a name="line.92"></a>
+<span class="sourceLineNo">093</span>   * #ConfigurationValueSourceComparingArbiter(List) ranked} closer to<a name="line.93"></a>
+<span class="sourceLineNo">094</span>   * {@code 0}.<a name="line.94"></a>
+<span class="sourceLineNo">095</span>   *<a name="line.95"></a>
+<span class="sourceLineNo">096</span>   * @param requestedCoordinates the ({@linkplain<a name="line.96"></a>
+<span class="sourceLineNo">097</span>   * Collections#unmodifiableMap(Map) immutable}) configuration<a name="line.97"></a>
+<span class="sourceLineNo">098</span>   * coordinates in effect for the request; may be {@code null}<a name="line.98"></a>
+<span class="sourceLineNo">099</span>   *<a name="line.99"></a>
+<span class="sourceLineNo">100</span>   * @param name the name of the configuration value; must not be<a name="line.100"></a>
+<span class="sourceLineNo">101</span>   * {@code null}<a name="line.101"></a>
+<span class="sourceLineNo">102</span>   *<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   * @param ambiguousValues an {@linkplain<a name="line.103"></a>
+<span class="sourceLineNo">104</span>   * Collections#unmodifiableCollection(Collection) immutable} {@link<a name="line.104"></a>
+<span class="sourceLineNo">105</span>   * Collection} of definitionally ambiguous {@link<a name="line.105"></a>
+<span class="sourceLineNo">106</span>   * ConfigurationValue}s that resulted from the request; may be<a name="line.106"></a>
+<span class="sourceLineNo">107</span>   * {@code null}<a name="line.107"></a>
+<span class="sourceLineNo">108</span>   *<a name="line.108"></a>
+<span class="sourceLineNo">109</span>   * @return the result of arbitration, or {@code null} if the dispute<a name="line.109"></a>
+<span class="sourceLineNo">110</span>   * cannot be arbitrated by this {@link Arbiter}<a name="line.110"></a>
+<span class="sourceLineNo">111</span>   *<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   * @exception NullPointerException if {@code name} is {@code null}<a name="line.112"></a>
+<span class="sourceLineNo">113</span>   */<a name="line.113"></a>
+<span class="sourceLineNo">114</span>  @Override<a name="line.114"></a>
+<span class="sourceLineNo">115</span>  public ConfigurationValue arbitrate(final Map&lt;? extends String, ? extends String&gt; requestedCoordinates,<a name="line.115"></a>
+<span class="sourceLineNo">116</span>                                      final String name,<a name="line.116"></a>
+<span class="sourceLineNo">117</span>                                      final Collection&lt;? extends ConfigurationValue&gt; ambiguousValues) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    final ConfigurationValue returnValue;<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    if (ambiguousValues == null || ambiguousValues.isEmpty() || !this.canArbitrate(ambiguousValues)) {<a name="line.119"></a>
+<span class="sourceLineNo">120</span>      returnValue = null;<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    } else {<a name="line.121"></a>
+<span class="sourceLineNo">122</span>      final int size = ambiguousValues.size();<a name="line.122"></a>
+<span class="sourceLineNo">123</span>      assert size &gt; 0;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>      switch (size) {<a name="line.124"></a>
+<span class="sourceLineNo">125</span>      case 1: // pathological case<a name="line.125"></a>
+<span class="sourceLineNo">126</span>        returnValue = ambiguousValues.iterator().next();<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        break;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>      default:<a name="line.128"></a>
+<span class="sourceLineNo">129</span>        final List&lt;? extends ConfigurationValue&gt; list = new ArrayList&lt;&gt;(ambiguousValues);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>        list.sort(this.getComparator());<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        returnValue = list.get(0);<a name="line.131"></a>
+<span class="sourceLineNo">132</span>        break;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>      }<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    }<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    return returnValue;<a name="line.135"></a>
+<span class="sourceLineNo">136</span>  }<a name="line.136"></a>
+<span class="sourceLineNo">137</span><a name="line.137"></a>
+<span class="sourceLineNo">138</span>  /**<a name="line.138"></a>
+<span class="sourceLineNo">139</span>   * Returns the {@link RankedComparator} used by this {@link<a name="line.139"></a>
+<span class="sourceLineNo">140</span>   * ConfigurationValueSourceComparingArbiter} implementation.<a name="line.140"></a>
+<span class="sourceLineNo">141</span>   *<a name="line.141"></a>
+<span class="sourceLineNo">142</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.142"></a>
+<span class="sourceLineNo">143</span>   *<a name="line.143"></a>
+<span class="sourceLineNo">144</span>   * &lt;p&gt;Overrides of this method must never return {@code null}.&lt;/p&gt;<a name="line.144"></a>
+<span class="sourceLineNo">145</span>   *<a name="line.145"></a>
+<span class="sourceLineNo">146</span>   * @return a non-{@code null} {@link RankedComparator}<a name="line.146"></a>
+<span class="sourceLineNo">147</span>   */<a name="line.147"></a>
+<span class="sourceLineNo">148</span>  @Override<a name="line.148"></a>
+<span class="sourceLineNo">149</span>  protected RankedComparator&lt;ConfigurationValue&gt; getComparator() {<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    return (RankedComparator&lt;ConfigurationValue&gt;)super.getComparator();<a name="line.150"></a>
+<span class="sourceLineNo">151</span>  }<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>  /**<a name="line.153"></a>
+<span class="sourceLineNo">154</span>   * Returns {@code true} if this {@link<a name="line.154"></a>
+<span class="sourceLineNo">155</span>   * ConfigurationValueSourceComparingArbiter} can effectively<a name="line.155"></a>
+<span class="sourceLineNo">156</span>   * arbitrate the conflict represented by the supplied {@link<a name="line.156"></a>
+<span class="sourceLineNo">157</span>   * Collection} of ambiguous {@link ConfigurationValue}s.<a name="line.157"></a>
+<span class="sourceLineNo">158</span>   *<a name="line.158"></a>
+<span class="sourceLineNo">159</span>   * @param ambiguousValues a {@link Collection} of {@link<a name="line.159"></a>
+<span class="sourceLineNo">160</span>   * ConfigurationValue}s; may be {@code null}; must not be modified<a name="line.160"></a>
+<span class="sourceLineNo">161</span>   * by overrides of this method<a name="line.161"></a>
+<span class="sourceLineNo">162</span>   *<a name="line.162"></a>
+<span class="sourceLineNo">163</span>   * @return {@code true} if this {@link<a name="line.163"></a>
+<span class="sourceLineNo">164</span>   * ConfigurationValueSourceComparingArbiter} can effectively<a name="line.164"></a>
+<span class="sourceLineNo">165</span>   * arbitrate the conflict represented by the supplied {@link<a name="line.165"></a>
+<span class="sourceLineNo">166</span>   * Collection} of ambiguous {@link ConfigurationValue}s; {@code<a name="line.166"></a>
+<span class="sourceLineNo">167</span>   * false} otherwise<a name="line.167"></a>
+<span class="sourceLineNo">168</span>   */<a name="line.168"></a>
+<span class="sourceLineNo">169</span>  protected boolean canArbitrate(final Collection&lt;? extends ConfigurationValue&gt; ambiguousValues) {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    final boolean returnValue;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    if (ambiguousValues == null || ambiguousValues.isEmpty()) {<a name="line.171"></a>
+<span class="sourceLineNo">172</span>      returnValue = false;<a name="line.172"></a>
+<span class="sourceLineNo">173</span>    } else {<a name="line.173"></a>
+<span class="sourceLineNo">174</span>      boolean canArbitrate = true;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>      final RankedComparator&lt;ConfigurationValue&gt; comparator = this.getComparator();<a name="line.175"></a>
+<span class="sourceLineNo">176</span>      assert comparator != null;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>      for (final ConfigurationValue value : ambiguousValues) {<a name="line.177"></a>
+<span class="sourceLineNo">178</span>        if (value == null || !comparator.ranks(value)) {<a name="line.178"></a>
+<span class="sourceLineNo">179</span>          canArbitrate = false;<a name="line.179"></a>
+<span class="sourceLineNo">180</span>          break;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>        }<a name="line.181"></a>
+<span class="sourceLineNo">182</span>      }<a name="line.182"></a>
+<span class="sourceLineNo">183</span>      returnValue = canArbitrate;<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    }<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    return returnValue;<a name="line.185"></a>
+<span class="sourceLineNo">186</span>  }<a name="line.186"></a>
+<span class="sourceLineNo">187</span><a name="line.187"></a>
+<span class="sourceLineNo">188</span>}<a name="line.188"></a>
 
 
 

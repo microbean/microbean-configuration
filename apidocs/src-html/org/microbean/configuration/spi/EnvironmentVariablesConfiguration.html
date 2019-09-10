@@ -41,7 +41,7 @@
 <span class="sourceLineNo">033</span> *<a name="line.33"></a>
 <span class="sourceLineNo">034</span> * @see #getValue(Map, String)<a name="line.34"></a>
 <span class="sourceLineNo">035</span> */<a name="line.35"></a>
-<span class="sourceLineNo">036</span>public class EnvironmentVariablesConfiguration extends AbstractConfiguration implements Serializable {<a name="line.36"></a>
+<span class="sourceLineNo">036</span>public final class EnvironmentVariablesConfiguration extends AbstractConfiguration implements Ranked, Serializable {<a name="line.36"></a>
 <span class="sourceLineNo">037</span><a name="line.37"></a>
 <span class="sourceLineNo">038</span><a name="line.38"></a>
 <span class="sourceLineNo">039</span>  /*<a name="line.39"></a>
@@ -74,50 +74,70 @@
 <span class="sourceLineNo">066</span>   */<a name="line.66"></a>
 <span class="sourceLineNo">067</span>  <a name="line.67"></a>
 <span class="sourceLineNo">068</span><a name="line.68"></a>
-<span class="sourceLineNo">069</span>  /**<a name="line.69"></a>
-<span class="sourceLineNo">070</span>   * Returns a {@link ConfigurationValue} representing the {@linkplain<a name="line.70"></a>
-<span class="sourceLineNo">071</span>   * System#getenv(String) environment variable} identified by the<a name="line.71"></a>
-<span class="sourceLineNo">072</span>   * supplied {@code name}, or {@code null}.<a name="line.72"></a>
-<span class="sourceLineNo">073</span>   *<a name="line.73"></a>
-<span class="sourceLineNo">074</span>   * @param coordinates the configuration coordinates in effect for<a name="line.74"></a>
-<span class="sourceLineNo">075</span>   * the current request; may be {@code null}<a name="line.75"></a>
-<span class="sourceLineNo">076</span>   *<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   * @param name the name of the configuration property for which to<a name="line.77"></a>
-<span class="sourceLineNo">078</span>   * return a {@link ConfigurationValue}; may be {@code null}<a name="line.78"></a>
+<span class="sourceLineNo">069</span>  @Override<a name="line.69"></a>
+<span class="sourceLineNo">070</span>  public final int getRank() {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>    return 200;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>  }<a name="line.72"></a>
+<span class="sourceLineNo">073</span><a name="line.73"></a>
+<span class="sourceLineNo">074</span>  <a name="line.74"></a>
+<span class="sourceLineNo">075</span>  /**<a name="line.75"></a>
+<span class="sourceLineNo">076</span>   * Returns a {@link ConfigurationValue} representing the {@linkplain<a name="line.76"></a>
+<span class="sourceLineNo">077</span>   * System#getenv(String) environment variable} identified by the<a name="line.77"></a>
+<span class="sourceLineNo">078</span>   * supplied {@code name}, or {@code null}.<a name="line.78"></a>
 <span class="sourceLineNo">079</span>   *<a name="line.79"></a>
-<span class="sourceLineNo">080</span>   * @return a {@link ConfigurationValue}, or {@code null}<a name="line.80"></a>
-<span class="sourceLineNo">081</span>   */<a name="line.81"></a>
-<span class="sourceLineNo">082</span>  @Override<a name="line.82"></a>
-<span class="sourceLineNo">083</span>  public ConfigurationValue getValue(final Map&lt;String, String&gt; coordinates, final String name) {<a name="line.83"></a>
-<span class="sourceLineNo">084</span>    ConfigurationValue returnValue = null;<a name="line.84"></a>
-<span class="sourceLineNo">085</span>    if (name != null) {<a name="line.85"></a>
-<span class="sourceLineNo">086</span>      final String propertyValue = System.getenv(name);<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      if (propertyValue != null) {<a name="line.87"></a>
-<span class="sourceLineNo">088</span>        returnValue = new ConfigurationValue(this, null /* deliberately null coordinates */, name, propertyValue, false);<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      }<a name="line.89"></a>
-<span class="sourceLineNo">090</span>    }<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    return returnValue;<a name="line.91"></a>
-<span class="sourceLineNo">092</span>  }<a name="line.92"></a>
-<span class="sourceLineNo">093</span><a name="line.93"></a>
-<span class="sourceLineNo">094</span>  /**<a name="line.94"></a>
-<span class="sourceLineNo">095</span>   * Returns a {@link Set} of the names of all {@link<a name="line.95"></a>
-<span class="sourceLineNo">096</span>   * ConfigurationValue}s that might be returned by this {@link<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   * Configuration}.<a name="line.97"></a>
-<span class="sourceLineNo">098</span>   *<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   * &lt;p&gt;This implementation does not return {@code null}.&lt;/p&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span>   *<a name="line.100"></a>
-<span class="sourceLineNo">101</span>   * &lt;p&gt;This implementation returns the equivalent of {@link<a name="line.101"></a>
-<span class="sourceLineNo">102</span>   * System#getenv() System.getenv().keySet()}.&lt;/p&gt;<a name="line.102"></a>
-<span class="sourceLineNo">103</span>   *<a name="line.103"></a>
-<span class="sourceLineNo">104</span>   * @return a non-{@code null} {@link Set} of names<a name="line.104"></a>
-<span class="sourceLineNo">105</span>   */<a name="line.105"></a>
-<span class="sourceLineNo">106</span>  @Override<a name="line.106"></a>
-<span class="sourceLineNo">107</span>  public Set&lt;String&gt; getNames() {<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    final Set&lt;String&gt; returnValue = System.getenv().keySet();<a name="line.108"></a>
-<span class="sourceLineNo">109</span>    return returnValue;<a name="line.109"></a>
-<span class="sourceLineNo">110</span>  }<a name="line.110"></a>
-<span class="sourceLineNo">111</span><a name="line.111"></a>
-<span class="sourceLineNo">112</span>}<a name="line.112"></a>
+<span class="sourceLineNo">080</span>   * @param coordinates the configuration coordinates in effect for<a name="line.80"></a>
+<span class="sourceLineNo">081</span>   * the current request; may be {@code null}<a name="line.81"></a>
+<span class="sourceLineNo">082</span>   *<a name="line.82"></a>
+<span class="sourceLineNo">083</span>   * @param name the name of the configuration property for which to<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   * return a {@link ConfigurationValue}; may be {@code null}<a name="line.84"></a>
+<span class="sourceLineNo">085</span>   *<a name="line.85"></a>
+<span class="sourceLineNo">086</span>   * @return a {@link ConfigurationValue}, or {@code null}<a name="line.86"></a>
+<span class="sourceLineNo">087</span>   */<a name="line.87"></a>
+<span class="sourceLineNo">088</span>  @Override<a name="line.88"></a>
+<span class="sourceLineNo">089</span>  public final ConfigurationValue getValue(final Map&lt;String, String&gt; coordinates, final String name) {<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    ConfigurationValue returnValue = null;<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    if (name != null) {<a name="line.91"></a>
+<span class="sourceLineNo">092</span>      final String propertyValue = System.getenv(name);<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      if (propertyValue != null) {<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        returnValue = new ConfigurationValue(this, null /* deliberately null coordinates */, name, propertyValue, false);<a name="line.94"></a>
+<span class="sourceLineNo">095</span>      }<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    }<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    return returnValue;<a name="line.97"></a>
+<span class="sourceLineNo">098</span>  }<a name="line.98"></a>
+<span class="sourceLineNo">099</span><a name="line.99"></a>
+<span class="sourceLineNo">100</span>  /**<a name="line.100"></a>
+<span class="sourceLineNo">101</span>   * Returns a {@link Set} of the names of all {@link<a name="line.101"></a>
+<span class="sourceLineNo">102</span>   * ConfigurationValue}s that might be returned by this {@link<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   * Configuration}.<a name="line.103"></a>
+<span class="sourceLineNo">104</span>   *<a name="line.104"></a>
+<span class="sourceLineNo">105</span>   * &lt;p&gt;This implementation does not return {@code null}.&lt;/p&gt;<a name="line.105"></a>
+<span class="sourceLineNo">106</span>   *<a name="line.106"></a>
+<span class="sourceLineNo">107</span>   * &lt;p&gt;This implementation returns the equivalent of {@link<a name="line.107"></a>
+<span class="sourceLineNo">108</span>   * System#getenv() System.getenv().keySet()}.&lt;/p&gt;<a name="line.108"></a>
+<span class="sourceLineNo">109</span>   *<a name="line.109"></a>
+<span class="sourceLineNo">110</span>   * @return a non-{@code null} {@link Set} of names<a name="line.110"></a>
+<span class="sourceLineNo">111</span>   */<a name="line.111"></a>
+<span class="sourceLineNo">112</span>  @Override<a name="line.112"></a>
+<span class="sourceLineNo">113</span>  public final Set&lt;String&gt; getNames() {<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    return System.getenv().keySet();<a name="line.114"></a>
+<span class="sourceLineNo">115</span>  }<a name="line.115"></a>
+<span class="sourceLineNo">116</span><a name="line.116"></a>
+<span class="sourceLineNo">117</span>  @Override<a name="line.117"></a>
+<span class="sourceLineNo">118</span>  public final int hashCode() {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    return System.getenv().hashCode();<a name="line.119"></a>
+<span class="sourceLineNo">120</span>  }<a name="line.120"></a>
+<span class="sourceLineNo">121</span><a name="line.121"></a>
+<span class="sourceLineNo">122</span>  @Override<a name="line.122"></a>
+<span class="sourceLineNo">123</span>  public final boolean equals(final Object other) {<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    return other instanceof EnvironmentVariablesConfiguration;<a name="line.124"></a>
+<span class="sourceLineNo">125</span>  }<a name="line.125"></a>
+<span class="sourceLineNo">126</span><a name="line.126"></a>
+<span class="sourceLineNo">127</span>  @Override<a name="line.127"></a>
+<span class="sourceLineNo">128</span>  public final String toString() {<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    return System.getenv().toString();<a name="line.129"></a>
+<span class="sourceLineNo">130</span>  }<a name="line.130"></a>
+<span class="sourceLineNo">131</span><a name="line.131"></a>
+<span class="sourceLineNo">132</span>}<a name="line.132"></a>
 
 
 
