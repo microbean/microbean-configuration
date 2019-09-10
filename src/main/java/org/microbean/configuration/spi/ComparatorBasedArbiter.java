@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017-2018 microBean.
+ * Copyright © 2017–2019 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,9 @@ public abstract class ComparatorBasedArbiter<T> implements Arbiter {
    * used.
    *
    * @see #ComparatorBasedArbiter(Comparator)
+   *
+   * @deprecated Please use the {@link
+   * #ComparatorBasedArbiter(Comparator)} constructor instead.
    */
   @Deprecated
   private ComparatorBasedArbiter() {

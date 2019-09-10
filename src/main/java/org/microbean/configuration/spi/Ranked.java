@@ -16,31 +16,8 @@
  */
 package org.microbean.configuration.spi;
 
-import java.util.Arrays;
+public interface Ranked {
 
-/**
- * A {@link ConfigurationValueSourceComparingArbiter} that ranks
- * {@linkplain System#getProperties() system properties} over
- * {@linkplain System#getenv(String) environment variables}.
- *
- * @author <a href="https://about.me/lairdnelson"
- * target="_parent">Laird Nelson</a>
- *
- * @see ConfigurationValueSourceComparingArbiter
- */
-public class SystemPropertiesOutrankEnvironmentVariablesArbiter extends ConfigurationValueSourceComparingArbiter {
-
-
-  /*
-   * Constructors.
-   */
-
-
-  /**
-   * Creates a new {@link SystemPropertiesOutrankEnvironmentVariablesArbiter}.
-   */
-  public SystemPropertiesOutrankEnvironmentVariablesArbiter() {
-    super();
-  }
-
+  public int getRank();
+  
 }

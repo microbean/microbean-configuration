@@ -33,7 +33,7 @@ import org.microbean.configuration.api.ConfigurationValue;
  *
  * @see #getValue(Map, String)
  */
-public class EnvironmentVariablesConfiguration extends AbstractConfiguration implements Serializable {
+public final class EnvironmentVariablesConfiguration extends AbstractConfiguration implements Ranked, Serializable {
 
 
   /*
@@ -66,6 +66,12 @@ public class EnvironmentVariablesConfiguration extends AbstractConfiguration imp
    */
   
 
+  @Override
+  public final int getRank() {
+    return 200;
+  }
+
+  
   /**
    * Returns a {@link ConfigurationValue} representing the {@linkplain
    * System#getenv(String) environment variable} identified by the
@@ -80,7 +86,7 @@ public class EnvironmentVariablesConfiguration extends AbstractConfiguration imp
    * @return a {@link ConfigurationValue}, or {@code null}
    */
   @Override
-  public ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
+  public final ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
     ConfigurationValue returnValue = null;
     if (name != null) {
       final String propertyValue = System.getenv(name);
@@ -104,9 +110,23 @@ public class EnvironmentVariablesConfiguration extends AbstractConfiguration imp
    * @return a non-{@code null} {@link Set} of names
    */
   @Override
-  public Set<String> getNames() {
-    final Set<String> returnValue = System.getenv().keySet();
-    return returnValue;
+  public final Set<String> getNames() {
+    return System.getenv().keySet();
+  }
+
+  @Override
+  public final int hashCode() {
+    return System.getenv().hashCode();
+  }
+
+  @Override
+  public final boolean equals(final Object other) {
+    return other instanceof EnvironmentVariablesConfiguration;
+  }
+
+  @Override
+  public final String toString() {
+    return System.getenv().toString();
   }
 
 }

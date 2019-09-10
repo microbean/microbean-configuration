@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017-2018 microBean.
+ * Copyright © 2017–2019 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ import javax.el.StandardELContext;
 import javax.el.ValueExpression;
 
 import org.microbean.configuration.api.AmbiguousConfigurationValuesException;
+import org.microbean.configuration.api.ConfigurationException;
 import org.microbean.configuration.api.ConfigurationValue;
 import org.microbean.configuration.api.ConversionException;
 import org.microbean.configuration.api.TypeLiteral;
@@ -59,7 +60,9 @@ import org.microbean.configuration.spi.Configuration;
 import org.microbean.configuration.spi.Converter;
 
 /**
- * A single source for configuration values suitable for an
+ * An implementation of the {@link
+ * org.microbean.configuration.api.Configurations} class that serves
+ * as a single source for configuration values suitable for an
  * application.
  *
  * @author <a href="https://about.me/lairdnelson"
@@ -74,6 +77,33 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * Static fields.
    */
 
+  
+  /**
+   * A {@link Comparator} of {@link ConfigurationValue}s that reverse
+   * sorts them according to their {@linkplain
+   * ConfigurationValue#specificity() specificity}.
+   *
+   * <p>This field is never {@code null}.</p>
+   */
+  private static final Comparator<ConfigurationValue> configurationValueComparator = Comparator.<ConfigurationValue>comparingInt(v -> v.specificity()).reversed();
+
+  /**
+   * A {@link ThreadLocal} tracking a {@link Set} of {@link
+   * Configuration}s that are currently in the process of executing
+   * their {@link Configuration#getValue(Map, String)} methods.
+   *
+   * <p>This field is never {@code null} but its contents might be
+   * {@code null}.</p>
+   *
+   * @see #getValue(Map, String, Converter, String)
+   *
+   * @see #activate(Configuration)
+   *
+   * @see #deactivate(Configuration)
+   *
+   * @see #isActive(Configuration)
+   */
+  private static final ThreadLocal<Map<Configurations, Set<Configuration>>> staticCurrentlyActiveConfigurations = ThreadLocal.withInitial(() -> new HashMap<>());
   
   /**
    * A {@link ServiceLoader} instance used by the {@link
@@ -112,29 +142,6 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    */
   @SuppressWarnings("rawtypes")
   private static volatile ServiceLoader<Arbiter> arbiterLoader;
-
-  
-  /**
-   * An {@linkplain Collections#unmodifiableMap(Map) immutable} {@link
-   * Map} of "wrapper" {@link Class} instances indexed by their
-   * {@linkplain Class#isPrimitive() primitive} counterparts.
-   *
-   * <p>This field is never {@code null}.</p>
-   */
-  private static final Map<Class<?>, Class<?>> wrapperTypes = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
-      private static final long serialVersionUID = 1L;
-      {
-        put(boolean.class, Boolean.class);
-        put(byte.class, Byte.class);
-        put(char.class, Character.class);
-        put(double.class, Double.class);
-        put(float.class, Float.class);
-        put(int.class, Integer.class);
-        put(long.class, Long.class);
-        put(short.class, Short.class);
-        put(void.class, Void.class);
-      }
-    });
   
   /**
    * The name of the configuration property whose value is a {@link
@@ -158,28 +165,33 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
   public static final String CONFIGURATION_COORDINATES = "configurationCoordinates";
 
   /**
-   * A deliberately non-{@code static} {@link ThreadLocal} containing
-   * a {@link Set} of {@link Configuration}s that are currently in the
-   * process of executing their {@link Configuration#getValue(Map,
-   * String)} methods.
+   * An {@linkplain Collections#unmodifiableMap(Map) immutable} {@link
+   * Map} of "wrapper" {@link Class} instances indexed by their
+   * {@linkplain Class#isPrimitive() primitive} counterparts.
    *
    * <p>This field is never {@code null}.</p>
-   *
-   * @see #getValue(Map, String, Converter, String)
-   *
-   * @see #activate(Configuration)
-   *
-   * @see #deactivate(Configuration)
-   *
-   * @see #isActive(Configuration)
    */
-  private final ThreadLocal<Set<Configuration>> currentlyActiveConfigurations;
+  private static final Map<Class<?>, Class<?>> wrapperTypes;
+
+  static {
+    final Map<Class<?>, Class<?>> map = new HashMap<>();
+    map.put(boolean.class, Boolean.class);
+    map.put(byte.class, Byte.class);
+    map.put(char.class, Character.class);
+    map.put(double.class, Double.class);
+    map.put(float.class, Float.class);
+    map.put(int.class, Integer.class);
+    map.put(long.class, Long.class);
+    map.put(short.class, Short.class);
+    map.put(void.class, Void.class);
+    wrapperTypes = Collections.unmodifiableMap(map);
+  }
 
 
   /*
    * Instance fields.
    */
-
+  
   
   /**
    * Whether this {@link Configurations} has been initialized.
@@ -325,7 +337,6 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
                         Collection<? extends Converter<?>> converters,
                         Collection<? extends Arbiter> arbiters) {
     super();
-    this.currentlyActiveConfigurations = ThreadLocal.withInitial(() -> new HashSet<>());
 
     this.expressionFactory = ExpressionFactory.newInstance();
     assert this.expressionFactory != null;
@@ -602,6 +613,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * {@linkplain #performArbitration(Map, String, Collection) was
    * performed} but could not resolve the dispute
    *
+   * @exception ConfigurationException if any other
+   * configuration-related error occurs
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   @Override
@@ -705,6 +719,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * {@linkplain #performArbitration(Map, String, Collection) was
    * performed} but could not resolve the dispute
    *
+   * @exception ConfigurationException if any other
+   * configuration-related error occurs
+   *
    * @see #getValue(Map, String, Converter, String)
    */
   public final <T> T getValue(final Map<String, String> configurationCoordinates, final String name, final Converter<T> converter) {
@@ -749,6 +766,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * {@linkplain #performArbitration(Map, String, Collection) was
    * performed} but could not resolve the dispute
    *
+   * @exception ConfigurationException if any other
+   * configuration-related error occurs
+   *
    * @see Converter#convert(String)
    *
    * @see Configuration#getValue(Map, String)
@@ -769,19 +789,24 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     if (configurationCoordinates == null) {
       configurationCoordinates = Collections.emptyMap();
     }
-    T returnValue = null;
 
+    // The selected value is the best candidate at any given moment
+    // for using to compute the return value of this method.  When it
+    // is null, it means we haven't found a suitable value yet.
     ConfigurationValue selectedValue = null;    
 
     // We use a PriorityQueue of ConfigurationValues sorted by their
     // specificity (most specific first) to keep track of the most
     // specific ConfigurationValue found so far.  We create it only
     // when necessary.
-    final Comparator<ConfigurationValue> comparator = Comparator.<ConfigurationValue>comparingInt(v -> v.specificity()).reversed();
     PriorityQueue<ConfigurationValue> values = null;
 
+    // Subclasses are given a chance to deal with bad values that
+    // might be encountered by badly-behaved Configuration instances;
+    // see #handleMalformedConfigurationValues(Collection) for
+    // details.
     Collection<ConfigurationValue> badValues = null;
-    
+
     for (final Configuration configuration : this.configurations) {
       assert configuration != null;
 
@@ -796,106 +821,116 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       } finally {
         this.deactivate(configuration);
       }
+      
+      if (value != null) {        
 
-      if (value != null) {
-
-        if (!name.equals(value.getName())) {
-          badValues.add(value);
-          continue;
-        }
-
-        Map<String, String> valueCoordinates = value.getCoordinates();
-        if (valueCoordinates == null) {
-          valueCoordinates = Collections.emptyMap();
-        }
-
-        final int configurationCoordinatesSize = configurationCoordinates.size();
-        final int valueCoordinatesSize = valueCoordinates.size();
-
-        if (configurationCoordinatesSize < valueCoordinatesSize) {
-          // Bad value!
-          if (badValues == null) {
-            badValues = new LinkedList<>();
+        if (name.equals(value.getName())) {
+          Map<String, String> valueCoordinates = value.getCoordinates();
+          if (valueCoordinates == null) {
+            valueCoordinates = Collections.emptyMap();
           }
-          badValues.add(value);
           
-        } else if (configurationCoordinates.equals(valueCoordinates)) {
-          // We have an exact match.  We hope it's going to be the
-          // only one.
+          final int configurationCoordinatesSize = configurationCoordinates.size();
+          final int valueCoordinatesSize = valueCoordinates.size();
           
-          if (selectedValue == null) {
-            
-            if (values == null || values.isEmpty()) {
-              // There aren't any conflicts yet; this is good.  This
-              // value will be our candidate.
-              selectedValue = value;
-
-            } else {
-              // We got a match, but we already *had* a match, so we
-              // don't have a candidate--instead, add it to the bucket
-              // of values that will be arbitrated later.
-              values.add(value);
-              
+          if (configurationCoordinatesSize < valueCoordinatesSize) {
+            // Bad value!
+            if (badValues == null) {
+              badValues = new LinkedList<>();
             }
+            badValues.add(value);
+            
+          } else if (configurationCoordinates.equals(valueCoordinates)) {
+            // We have an exact match.  We hope it's going to be the
+            // only one.
+            
+            if (selectedValue == null) {
+              
+              if (values == null || values.isEmpty()) {
+                // There aren't any conflicts yet; this is good.  This
+                // value will be our candidate.
+                selectedValue = value;
+                
+              } else {
+                // We got a match, but we already *had* a match, so we
+                // don't have a candidate--instead, add it to the
+                // bucket of values that will be arbitrated later.
+                values.add(value);
+                
+              }
+              
+            } else {
+              assert selectedValue != null;
+              // We have an exact match, but we already identified a
+              // candidate, so oops, we have to treat our prior match
+              // and this one as non-candidates.
+              
+              if (values == null) {
+                values = new PriorityQueue<>(configurationValueComparator);
+              }
+              values.add(selectedValue);
+              selectedValue = null;
+              values.add(value);
+            }
+            
+          } else if (configurationCoordinatesSize == valueCoordinatesSize) {
+            // Bad value!  The configuration subsystem handed back a
+            // value containing coordinates not drawn from the
+            // configurationCoordinatesSet.  We know this because we
+            // already tested for Set equality, which failed, so this
+            // test means disparate entries.
+            if (badValues == null) {
+              badValues = new LinkedList<>();
+            }
+            badValues.add(value);
+            
+          } else if (selectedValue != null) {
+            // Nothing to do; we've already got our candidate.  We
+            // don't break here because we're going to ensure there
+            // aren't any duplicates.
+            
+          } else if (configurationCoordinates.entrySet().containsAll(valueCoordinates.entrySet())) {
+            // We specified, e.g., {a=b, c=d, e=f} and they have, say,
+            // {c=d, e=f} or {a=b, c=d} etc. but not, say, {q=r}.
+            if (values == null) {
+              values = new PriorityQueue<>(configurationValueComparator);
+            }
+            values.add(value);
             
           } else {
-            assert selectedValue != null;
-            // We have an exact match, but we already identified a
-            // candidate, so oops, we have to treat our prior match
-            // and this one as non-candidates.
-            
-            if (values == null) {
-              values = new PriorityQueue<>(comparator);
+            // Bad value!
+            if (badValues == null) {
+              badValues = new LinkedList<>();
             }
-            values.add(selectedValue);
-            selectedValue = null;
-            values.add(value);
+            badValues.add(value);
+            
           }
-
-        } else if (configurationCoordinatesSize == valueCoordinatesSize) {
-          // Bad value!  The configuration subsystem handed back a
-          // value containing coordinates not drawn from the
-          // configurationCoordinatesSet.  We know this because we already
-          // tested for Set equality, which failed, so this test means
-          // disparate entries.
-          if (badValues == null) {
-            badValues = new LinkedList<>();
-          }
-          badValues.add(value);
-          
-        } else if (selectedValue != null) {
-          // Nothing to do; we've already got our candidate.  We don't
-          // break here because we're going to ensure there aren't any
-          // duplicates.
-          
-        } else if (configurationCoordinates.entrySet().containsAll(valueCoordinates.entrySet())) {
-          // We specified, e.g., {a=b, c=d, e=f} and they have, say,
-          // {c=d, e=f} or {a=b, c=d} etc. but not, say, {q=r}.
-          if (values == null) {
-            values = new PriorityQueue<>(comparator);
-          }
-          values.add(value);
-          
         } else {
-          // Bad value!
+          // We asked for "frobnicationInterval"; they responded with
+          // "hostname".  Bad value.
           if (badValues == null) {
             badValues = new LinkedList<>();
           }
           badValues.add(value);
-          
         }
       }
     }
     assert this.allConfigurationsInactive();
 
+    // Give a subclass a chance to deal with bad values.  Dealing with
+    // them might very well involve throwing an exception which will
+    // obviously preclude arbitration and conversion.  That's fine.
     if (badValues != null && !badValues.isEmpty()) {
       this.handleMalformedConfigurationValues(badValues);
     }
-    
+
+    // Perform arbitration if necessary, or otherwise ensure that we
+    // end up with the most suitable value possible.
     if (selectedValue == null) {
       final Collection<ConfigurationValue> valuesToArbitrate = new LinkedList<>();
       int highestSpecificitySoFarEncountered = -1;
       if (values != null) {
+        VALUES_LOOP:
         while (!values.isEmpty()) {
           
           final ConfigurationValue value = values.poll();
@@ -912,7 +947,11 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
               selectedValue = value;
               highestSpecificitySoFarEncountered = valueSpecificity;
             } else if (valuesToArbitrate.isEmpty()) {
-              break;
+              // We have a selected value that is non-null, and no
+              // further values to arbitrate, so we're done.  We know
+              // we picked the most specific value so we effectively
+              // discard the others.
+              break VALUES_LOOP;
             } else {
               valuesToArbitrate.add(value);
             }
@@ -944,12 +983,13 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
           
         }
       }
-
       if (selectedValue == null) {
         selectedValue = this.performArbitration(configurationCoordinates, name, Collections.unmodifiableCollection(valuesToArbitrate));
       }
     }
 
+    // Perform conversion, including of null values.
+    final T returnValue;
     if (selectedValue == null) {
       if (defaultValue == null) {
         returnValue = converter.convert(null);
@@ -1052,6 +1092,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     if (this.logger.isLoggable(Level.FINER)) {
       this.logger.entering(cn, mn);
     }
+    
     final Set<String> returnValue;
     if (this.configurations == null || this.configurations.isEmpty()) {
       returnValue = Collections.emptySet();
@@ -1071,6 +1112,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
         returnValue = Collections.unmodifiableSet(names);
       }
     }
+    
     if (this.logger.isLoggable(Level.FINER)) {
       this.logger.exiting(cn, mn, returnValue);
     }
@@ -1085,12 +1127,26 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * <p>The default implementation of this method does nothing.
    * Malformed values are thus effectively discarded.</p>
    *
+   * <p>This method is called from the {@link #getValue(Map, String,
+   * Converter, String)} method.</p>
+   *
    * @param badValues a {@link Collection} of {@link
    * ConfigurationValue} instances that were deemed to be malformed in
    * some way; may be {@code null}
+   *
+   * @exception ConfigurationException if the {@link #getValue(Map,
+   * String, Converter, String)} method should abort processing
+   *
+   * @see #getValue(Map, String, Converter, String)
    */
   protected void handleMalformedConfigurationValues(final Collection<ConfigurationValue> badValues) {
-    
+    if (this.logger.isLoggable(Level.FINER)) {
+      final String cn = this.getClass().getName();
+      final String mn = "handleMalformedConfigurationValues";
+      this.logger.entering(cn, mn, badValues);
+      this.logger.logp(Level.FINER, cn, mn, "Discarding {0}", badValues);
+      this.logger.exiting(cn, mn);
+    }
   }
 
   /**
@@ -1194,7 +1250,14 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see #deactivate(Configuration)
    */
   private final boolean isActive(final Configuration configuration) {
-    return configuration != null && this.currentlyActiveConfigurations.get().contains(configuration);
+    final boolean returnValue;
+    if (configuration == null) {
+      returnValue = false;
+    } else {
+      final Set<Configuration> configurations = staticCurrentlyActiveConfigurations.get().get(this);
+      returnValue = configurations != null && configurations.contains(configuration);
+    }
+    return returnValue;
   }
 
   /**
@@ -1213,7 +1276,14 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    */
   private final void activate(final Configuration configuration) {
     if (configuration != null) {
-      this.currentlyActiveConfigurations.get().add(configuration);
+      final Map<Configurations, Set<Configuration>> map = staticCurrentlyActiveConfigurations.get();
+      assert map != null;
+      Set<Configuration> configurations = map.get(this);
+      if (configurations == null) {
+        configurations = new HashSet<>();
+        map.put(this, configurations);
+      }
+      configurations.add(configuration);
       assert this.isActive(configuration);
     }
   }
@@ -1234,7 +1304,10 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    */
   private final void deactivate(final Configuration configuration) {
     if (configuration != null) {
-      this.currentlyActiveConfigurations.get().remove(configuration);
+      final Set<Configuration> configurations = staticCurrentlyActiveConfigurations.get().get(this);
+      if (configurations != null) {
+        configurations.remove(configuration);
+      }
     }
     assert !this.isActive(configuration);
   }
@@ -1252,7 +1325,8 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
    * @see #deactivate(Configuration)
    */
   private final boolean allConfigurationsInactive() {
-    return this.currentlyActiveConfigurations.get().isEmpty();
+    final Set<Configuration> configurations = staticCurrentlyActiveConfigurations.get().get(this);
+    return configurations == null || configurations.isEmpty();
   }
 
 
@@ -1281,6 +1355,7 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
      * Constructors.
      */
 
+    
     /**
      * Creates a new {@link ConfigurationELResolver}.
      */
@@ -1288,6 +1363,12 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
       super();
     }
 
+
+    /*
+     * Instance methods.
+     */
+
+    
     /**
      * Returns {@link Class Object.class} when invoked.
      *
@@ -1399,10 +1480,10 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
         }
       } else if (base instanceof Configurations) {
         if (property instanceof String) {
-          final String value = ((Configurations)base).getValue((String)property);
+          final String value = ((Configurations)base).getValue(property.toString());
           elContext.setPropertyResolved(true);
           if (value == null) {
-            throw new PropertyNotFoundException((String)property);
+            throw new PropertyNotFoundException(property.toString());
           }
           returnValue = String.class;
         }
@@ -1467,11 +1548,10 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
         }
       } else if (base instanceof Configurations) {
         if (property instanceof String) {
-          final String configurationPropertyName = (String)property;
-          returnValue = ((Configurations)base).getValue(configurationPropertyName);
+          returnValue = ((Configurations)base).getValue(property.toString());
           elContext.setPropertyResolved(true);
           if (returnValue == null) {
-            throw new PropertyNotFoundException(configurationPropertyName);
+            throw new PropertyNotFoundException(property.toString());
           }          
         }
       }
@@ -1479,9 +1559,9 @@ public class Configurations extends org.microbean.configuration.api.Configuratio
     }
 
     /**
-     * Effectively does nothing when invoked by {@linkplain
-     * ELContext#setPropertyResolved(boolean) marking the property as
-     * resolved}.
+     * Effectively does nothing by {@linkplain
+     * ELContext#setPropertyResolved(boolean) marking the supplied
+     * <code>property</code> as not resolved}.
      *
      * @param elContext the {@link ELContext} in effect; may be {@code null}
      *

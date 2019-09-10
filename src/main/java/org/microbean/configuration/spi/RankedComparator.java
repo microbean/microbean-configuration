@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017-2018 microBean.
+ * Copyright © 2017–2019 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,25 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A {@link Comparator} that uses a {@link List} of {@link Object}s to
- * rank {@linkplain #getComparisonObject(Object) other objects} for
- * comparison purposes.
+ * A {@link Comparator} that ranks {@linkplain
+ * #getComparisonObject(Object) other objects} for comparison
+ * purposes.
+ *
+ * <p>A <em>rank</em> for the purposes of this class is a positive
+ * integer.  One integer representing a rank <em>outranks</em> another
+ * integer representing a rank if the first integer is greater than
+ * the second.  Hence, <em>e.g.</em>, {@code 1} outranks {@code 0}.  A
+ * negative integer cannot represent a rank and in the context of
+ * ranking means, effectively, that any rank it might otherwise
+ * represent is unknown.</p>
+ *
+ * <p>A {@link RankedComparator} can accept an optional {@link List}
+ * at {@linkplain #RankedComparator(List) construction time} that can
+ * be used for ranking purposes in case the type of objects the {@link
+ * RankedComparator} compares are not instances of {@link Ranked}.  In
+ * such a case, the {@linkplain List#indexOf(Object) index of} an
+ * object in a {@linkplain Collections#reverse(List) reversed} copy of
+ * the supplied {@link List} is used as its rank.</p>
  *
  * @param <T> the type of object to {@linkplain #compare(Object,
  * Object) compare}
@@ -80,9 +96,18 @@ public class RankedComparator<T> implements Comparator<T>, Serializable {
   /**
    * Creates a new {@link RankedComparator}.
    *
+   * @see #RankedComparator(List)
+   */
+  public RankedComparator() {
+    this(null);
+  }
+
+  /**
+   * Creates a new {@link RankedComparator}.
+   *
    * @param items a {@link List} of {@link Object}s that will be used
-   * for ranking purposes; the item at position {@code 0} is deemed to
-   * outrank all others; copied by value
+   * for ranking purposes; may be {@code null}; the item at position
+   * {@code 0} is deemed to outrank all others; copied by value
    *
    * @see #getComparisonObject(Object)
    */
@@ -91,7 +116,9 @@ public class RankedComparator<T> implements Comparator<T>, Serializable {
     if (items == null || items.isEmpty()) {
       this.items = Collections.emptyList();
     } else {
-      this.items = Collections.unmodifiableList(new ArrayList<>(items));
+      final List<?> copy = new ArrayList<>(items);
+      Collections.reverse(copy);
+      this.items = Collections.unmodifiableList(copy);
     }
   }
 
@@ -114,7 +141,19 @@ public class RankedComparator<T> implements Comparator<T>, Serializable {
    */
   public final boolean ranks(final T object) {
     final Object comparisonObject = this.getComparisonObject(object);
-    return comparisonObject != null && this.items.contains(comparisonObject);
+    return comparisonObject != null && (comparisonObject instanceof Ranked || this.items.contains(comparisonObject));
+  }
+
+  private final int getRank(final Object object) {
+    final int rank;
+    if (object == null) {
+      rank = -1;
+    } else if (object instanceof Ranked) {
+      rank = ((Ranked)object).getRank();
+    } else {
+      rank = this.items.indexOf(object);
+    }
+    return rank;
   }
 
   /**
@@ -154,24 +193,20 @@ public class RankedComparator<T> implements Comparator<T>, Serializable {
       assert one != null;
       returnValue = -1; // nulls sort "right"; non-nulls win
     } else {
-      final Object oneComparisonObject = this.getComparisonObject(one);
-      final int oneIndex = oneComparisonObject == null ? -1 : this.items.indexOf(oneComparisonObject);
-      final Object twoComparisonObject = this.getComparisonObject(two);
-      final int twoIndex = twoComparisonObject == null ? -1 : this.items.indexOf(twoComparisonObject);
-      if (oneIndex < 0) {
-        if (twoIndex < 0) {
-          returnValue = 0;
+      final int oneRank = this.getRank(this.getComparisonObject(one));
+      final int twoRank = this.getRank(this.getComparisonObject(two));
+      if (oneRank < 0) {
+        if (twoRank < 0) {
+          returnValue = 0; // a negative rank means "no idea"
         } else {
           returnValue = 1; // two "won"; it's ranked; one isn't
         }
-      } else if (twoIndex < 0) {
-        returnValue = -1; // one "won"; it's ranked; two isn't
-      } else if (oneIndex > twoIndex) {
-        returnValue = 1; // two "won"; its rank is closer to 0
-      } else if (oneIndex == twoIndex) {
+      } else if (oneRank > twoRank) {
+        returnValue = -1; // one "won"; its rank is higher than two's
+      } else if (oneRank == twoRank) {
         returnValue = 0;
       } else {
-        returnValue = -1; // one "won"; its rank is closer to 0
+        returnValue = 1; // two "won"; its rank is higher than one's
       }
     }
     return returnValue;

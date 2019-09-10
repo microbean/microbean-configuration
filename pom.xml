@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Xlint="urn:javac" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>microbean-configuration</artifactId>
-  <version>0.4.5-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
 
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>9</version>
-    <relativePath />
+    <version>11</version>
+    <relativePath/>
   </parent>
 
-  <name>microBean Configuration</name>
+  <name>microBean™ Configuration</name>
   <description>${project.name}</description>
   <url>https://microbean.github.io/${project.artifactId}</url>
+  <inceptionYear>2017</inceptionYear>
 
   <scm>
     <connection>scm:git:git@github.com:microbean/${project.artifactId}.git</connection>
@@ -27,16 +28,16 @@
     <dependencies>
       
       <dependency>
-        <groupId>javax.el</groupId>
-        <artifactId>javax.el-api</artifactId>
-        <version>3.0.1-b06</version>
+        <groupId>jakarta.el</groupId>
+        <artifactId>jakarta.el-api</artifactId>
+        <version>3.0.3</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.glassfish</groupId>
-        <artifactId>javax.el</artifactId>
-        <version>3.0.1-b10</version>
+        <artifactId>jakarta.el</artifactId>
+        <version>3.0.3</version>
         <type>jar</type>
       </dependency>
 
@@ -63,7 +64,7 @@
         
     <dependency>
       <groupId>org.glassfish</groupId>
-      <artifactId>javax.el</artifactId>
+      <artifactId>jakarta.el</artifactId>
       <type>jar</type>
       <scope>test</scope>
     </dependency>
@@ -71,8 +72,8 @@
     <!-- Provided-scoped dependencies. -->
     
     <dependency>
-      <groupId>javax.el</groupId>
-      <artifactId>javax.el-api</artifactId>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
@@ -90,22 +91,6 @@
 
   <build>
 
-    <pluginManagement>
-      <plugins>
-
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.1</version>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.0.0</version>
-        </plugin>
-        
-      </plugins>
-    </pluginManagement>
-    
     <plugins>
 
       <plugin>
@@ -135,7 +120,7 @@
   <properties>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>http://docs.oracle.com/javaee/7/api/,https://microbean.github.io/microbean-configuration-api/apidocs/</links>
+    <links>https://jakarta.ee/specifications/expression-language/3.0/apidocs/,https://microbean.github.io/microbean-configuration-api/apidocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
   </properties>

@@ -35,7 +35,7 @@ import org.microbean.configuration.api.ConfigurationValue;
  * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
-public class SystemPropertiesConfiguration extends AbstractConfiguration implements Serializable {
+public final class SystemPropertiesConfiguration extends AbstractConfiguration implements Ranked, Serializable {
 
 
   /*
@@ -110,6 +110,11 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
    * Instance methods.
    */
 
+  
+  @Override
+  public final int getRank() {
+    return 400;
+  }
 
   /**
    * Returns a {@link ConfigurationValue} representing the {@linkplain
@@ -131,7 +136,7 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
    * @return a {@link ConfigurationValue}, or {@code null}
    */
   @Override
-  public ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
+  public final ConfigurationValue getValue(final Map<String, String> coordinates, final String name) {
     ConfigurationValue returnValue = null;
     if (name != null) {
       final String propertyValue = System.getProperty(name);
@@ -158,7 +163,7 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
    * @return a non-{@code null} {@link Set} of names
    */
   @Override
-  public Set<String> getNames() {
+  public final Set<String> getNames() {
     final Properties properties = System.getProperties();
     assert properties != null; // by contract
     assert !properties.isEmpty(); // by contract
@@ -183,6 +188,21 @@ public class SystemPropertiesConfiguration extends AbstractConfiguration impleme
    */
   protected boolean isAuthoritative(final String name) {
     return name != null && systemPropertiesGuaranteedToExist.contains(name);
+  }
+
+  @Override
+  public final int hashCode() {
+    return System.getProperties().hashCode();
+  }
+
+  @Override
+  public final boolean equals(final Object other) {
+    return other instanceof SystemPropertiesConfiguration;
+  }
+
+  @Override
+  public String toString() {
+    return System.getProperties().toString();
   }
   
 }

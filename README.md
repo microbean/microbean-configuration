@@ -1,21 +1,21 @@
-# microBean Configuration
+# microBean™ Configuration
 
 [![Build Status](https://travis-ci.org/microbean/microbean-configuration.svg?branch=master)](https://travis-ci.org/microbean/microbean-configuration)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-configuration/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-configuration)
 
-The microBean Configuration project provides yet another framework for
-acquiring configuration values from within a Java SE application,
-implementing the [microBean Configuration API project][10].
+The microBean™ Configuration project provides yet another framework
+for acquiring configuration values from within a Java SE application,
+implementing the [microBean™ Configuration API project][10].
 
 There are many configuration frameworks for Java SE.  All focus on
 making it easy for application developers to ask for configuration
 values without having to know what systems provide those values.
 
-microBean Configuration takes a slightly different approach.  The
+microBean™ Configuration takes a slightly different approach.  The
 application's full configuration is considered to be located by its
 _configuration coordinates_ within _configuration space_.  Within that
 space reside its actual configuration properties.  This terminology is
-important for understanding how microBean Configuration works.
+important for understanding how microBean™ Configuration works.
 
 Terminology
 ===========
@@ -117,10 +117,10 @@ Usage Patterns
 Application
 -----------
 
-Applications wishing to use the microBean Configuration project create
+Applications wishing to use the microBean™ Configuration project create
 a [`Configurations`][0] object and then call its [`getValue()`][1]
 methods.  The [`Configurations`][0] object is the centerpiece of the
-microBean Configuration framework.
+microBean™ Configuration framework.
 
 Deployment and Integration
 --------------------------

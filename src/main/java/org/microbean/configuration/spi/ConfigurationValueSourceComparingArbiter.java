@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017-2018 microBean.
+ * Copyright © 2017–2019 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,28 +43,36 @@ public class ConfigurationValueSourceComparingArbiter extends ComparatorBasedArb
    * Constructors.
    */
 
-  
+
   /**
    * Creates a new {@link ConfigurationValueSourceComparingArbiter}.
    *
-   * @param configurationTypes a {@link List} of {@link Class}
+   * @see #ConfigurationValueSourceComparingArbiter(List)
+   */
+  public ConfigurationValueSourceComparingArbiter() {
+    this(null);
+  }
+
+  /**
+   * Creates a new {@link ConfigurationValueSourceComparingArbiter}.
+   *
+   * @param configurationInstances a {@link List} of {@link Class}
    * instances describing configuration value {@linkplain
    * ConfigurationValue#getSource() sources}; may be (trivially)
    * {@code null}
    *
    * @see RankedComparator#RankedComparator(List)
    */
-  public ConfigurationValueSourceComparingArbiter(final List<? extends Class<? extends Configuration>> configurationTypes) {
-    super(new RankedComparator<ConfigurationValue>(configurationTypes) {
+  public ConfigurationValueSourceComparingArbiter(final List<? extends Configuration> configurationInstances) {
+    super(new RankedComparator<ConfigurationValue>(configurationInstances) {
         private static final long serialVersionUID = 1L;
         @Override
         protected final Object getComparisonObject(final ConfigurationValue realObject) {
-          Object returnValue = null;
-          if (realObject != null) {
-            final Object source = realObject.getSource();
-            if (source != null) {
-              returnValue = source.getClass();
-            }
+          final Object returnValue;
+          if (realObject == null) {
+            returnValue = null;
+          } else {
+            returnValue = realObject.getSource();
           }
           return returnValue;
         }
